@@ -1,5 +1,3 @@
-/* createed by jilin.jin  */
-
 import React from 'react'
 
 const inner = Symbol();
@@ -42,8 +40,6 @@ function registeReducers(_, dispatch){
       });
   }
 }
-
-
 function reducer(state,action){
   !runtime_state && (runtime_state = state);
   if(action.inner === inner){
@@ -121,67 +117,6 @@ function Provider({children,...rest}) {
       </StateContext.Provider>
     )
 }
-
-export function useDispatch(action){
-     if(Object.prototype.toString.call(action) !== '[object Object]'){
-        throw new Error('action in useDispatch must be an Object');
-     }
-     if(!action.hasOwnProperty('type')){
-        throw new Error('action in useDispatch must have a property named "type"');
-     }
-     if(typeof action.type !== 'string'){
-        throw new Error('your must be a string');
-     }
-     if(action.type.indexOf('/') === -1){
-        throw new Error('you must do some effects in your type');
-     }
-     useHState();
-     const dispatch = useDispatcher();
-
-     let { type ,...others} = action;
-     type = type.split('/');
-     if(type[0].length === 0){
-      throw new Error('can not resolve the empty model name');
-     }
-     const model = MODELS[type[0]];
-     if(!model){
-        throw new Error(`can not find the Model named ${type[0]}`);
-     }
-     if(!model.hasOwnProperty('effects')){
-      throw new Error(`can not find the effects in the Model ${type[0]}`);
-     }
-     const effects = model.effects;
-     if(Object.prototype.toString.call(effects) !== '[object Object]'){
-      throw new Error('effects must be an Object');
-   }
-     let effect = effects[type[1]];
-     if( typeof effect !== 'function'){
-        throw new Error(`the effect named ${type[1]} must be a function`);
-     }
-     const effectwrapped = async (...rest) => {
-      return effect(...rest,{...others,state:Object.create({get value(){return runtime_state[type[0]]}}),setState:(data) => {
-        dispatch({
-          type:'set',
-          name:type[0],
-          data
-        })
-      },
-      select:(name) => {
-        return get(name,dispatch);
-      }
-      });
-     } 
-     return effectwrapped;
-}
-
-export function useDispatcher() {
-    const dispatch = React.useContext(DispatchContext)
-    if (dispatch === undefined) {
-      throw new Error('useDispatcher must be used within a Provider')
-    }
-    return dispatch
-}
-
 function useHState(){
   const state = React.useContext(StateContext);
   if (state === undefined) {
@@ -190,31 +125,6 @@ function useHState(){
   !runtime_state && (runtime_state = state);
   return runtime_state;
 }
-
-export function useAdd(name, initdate, once){
-    if(typeof name !== 'string'){
-      throw new Error('name must be a string')
-    }
-    if(name.length === 0){
-      throw new Error('name can not be empty')
-    }
-    useHState();
-    const dispatch = useDispatcher()
-    if (runtime_state === undefined || dispatch === undefined) {
-      throw new Error('useAdd must be used within a Provider')
-    }
-    if(runtime_state.hasOwnProperty(name)){
-      throw new Error(`you have already added the state name -- ${name}  before !`)
-    }
-    let data = initdate;
-    if(typeof initdate === 'function'){
-      data = initdate();
-    }
-    React.useEffect(() => {
-      dispatch({type:'add',name,initdate:data,inner});
-    },once ? [] : undefined)
-}
-
 function get(name,dispatch){
   if(typeof name !== 'string'){
     throw new Error('name must be a string')
@@ -253,9 +163,92 @@ function get(name,dispatch){
     (value) => { dispatch({ type: 'updateSet',name, data: value, inner })}
   ]
 }
-
 function removeConnect(uid){
   delete REFRESH_CACHE[uid];
+}
+
+export function useAdd(name, initdate, once){
+  if(typeof name !== 'string'){
+    throw new Error('name must be a string')
+  }
+  if(name.length === 0){
+    throw new Error('name can not be empty')
+  }
+  useHState();
+  const dispatch = useDispatcher()
+  if (runtime_state === undefined || dispatch === undefined) {
+    throw new Error('useAdd must be used within a Provider')
+  }
+  if(runtime_state.hasOwnProperty(name)){
+    throw new Error(`you have already added the state name -- ${name}  before !`)
+  }
+  let data = initdate;
+  if(typeof initdate === 'function'){
+    data = initdate();
+  }
+  React.useEffect(() => {
+    dispatch({type:'add',name,initdate:data,inner});
+  },once ? [] : undefined)
+}
+
+export function useDispatch(action){
+  if(Object.prototype.toString.call(action) !== '[object Object]'){
+     throw new Error('action in useDispatch must be an Object');
+  }
+  if(!action.hasOwnProperty('type')){
+     throw new Error('action in useDispatch must have a property named "type"');
+  }
+  if(typeof action.type !== 'string'){
+     throw new Error('your must be a string');
+  }
+  if(action.type.indexOf('/') === -1){
+     throw new Error('you must do some effects in your type');
+  }
+  useHState();
+  const dispatch = useDispatcher();
+
+  let { type ,...others} = action;
+  type = type.split('/');
+  if(type[0].length === 0){
+   throw new Error('can not resolve the empty model name');
+  }
+  const model = MODELS[type[0]];
+  if(!model){
+     throw new Error(`can not find the Model named ${type[0]}`);
+  }
+  if(!model.hasOwnProperty('effects')){
+   throw new Error(`can not find the effects in the Model ${type[0]}`);
+  }
+  const effects = model.effects;
+  if(Object.prototype.toString.call(effects) !== '[object Object]'){
+   throw new Error('effects must be an Object');
+}
+  let effect = effects[type[1]];
+  if( typeof effect !== 'function'){
+     throw new Error(`the effect named ${type[1]} must be a function`);
+  }
+  const effectwrapped = async (...rest) => {
+   return effect(...rest,{...others,state:Object.create({get value(){return runtime_state[type[0]]}}),setState:(data) => {
+     dispatch({
+       type:'set',
+       name:type[0],
+       data
+     })
+   },
+   select:(name) => {
+     return get(name,dispatch);
+   }
+   });
+  } 
+  return effectwrapped;
+}
+
+export function useDispatcher() {
+ const dispatch = React.useContext(DispatchContext)
+ if (dispatch === undefined) {
+   throw new Error('useDispatcher must be used within a Provider')
+ }
+ return dispatch
 }
 
 export function useModel(name){
@@ -274,6 +267,7 @@ export function useModel(name){
     const dispatch = useDispatcher()
     return get(name,dispatch);
 }
+
 export function connect(model,action){
   useHState();
   return (Component) => {
@@ -284,6 +278,7 @@ export function connect(model,action){
     }
   }
 }
+
 export function Dynamic(props){
   const [state,setMount] = React.useState({mounted: false,component: null});
   const dispatch = useDispatcher();

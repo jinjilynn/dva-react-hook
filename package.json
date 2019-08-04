@@ -1,0 +1,29 @@
+{
+  "name": "dva-react-hook",
+  "version": "1.0.0",
+  "description": "",
+  "main": "/dist/index.js",
+  "scripts": {},
+  "keywords": [
+    "hook",
+    "redux",
+    "reducer",
+    "state",
+    "dva"
+  ],
+  "author": {
+    "name": "jilin.jin",
+    "email": "jinjilin@hotmail.com"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "react": "^16.8.6"
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "@babel/runtime": "^7.5.5",
+    "react": "^16.8.6"
+  }
+}

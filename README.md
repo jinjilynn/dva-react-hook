@@ -102,14 +102,16 @@ Props|Type|Description
 :--:|:--:|:--:
 renderBefore  | Function  | you can something before render
 component | React.ReactNode  |  A React component to render
-|| <Dynamic component={ReactNode} />
 render  | Function  |  This allows for convenient inline rendering and wrapping,in addition to the ability to load component with ’import‘ asynchronously
-||<Dynamic render={() => <App />} />
-||<Dynamic render={() => import('url')} />
 models  | Function \| Array  |  Function should return an array.You can load model asynchronously with ’import‘ or synchronously with array
-||<Dynamic models={() => [import('url1'),import('url2'),...]} />
-||<Dynamic models={[model-object,model-object,...] />
 
+```tsx
+<Dynamic component={ReactNode} />
+<Dynamic render={() => <App />} />
+<Dynamic render={() => import('url')} />
+<Dynamic models={() => [import('url1'),import('url2'),...]} />
+<Dynamic models={[model-object,model-object,...] />
+```
 ##### model-object format:
 ```javascript
 {
@@ -143,7 +145,7 @@ const click = () => {
   page // the value is not 1
 }
 ```
-######ps: Usually when a context value is changed, all components that useContext will re-render, but this framework is unusual, so  if only used part of the state is changed, corresponding component will re-render.
+##### ps: Usually when a context value is changed, all components that useContext will re-render, but this framework is unusual, so  if only used part of the state is changed, corresponding component will re-render.
 
 ### `useDispatch`
 

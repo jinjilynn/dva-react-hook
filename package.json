@@ -9,7 +9,8 @@
     "redux",
     "reducer",
     "state",
-    "dva"
+    "dva",
+    "saga"
   ],
   "author": {
     "name": "jilin.jin",

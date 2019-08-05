@@ -1,8 +1,6 @@
 # dva-react-hook
-
-> React Hooks based, imitating dva, lightweight framework.
 [![NPM](https://img.shields.io/badge/npm-v1.0.2-blue)](https://www.npmjs.com/package/dva-react-hook)
-
+> React Hooks based, imitating dva, lightweight framework.
 
 ## Table of Contents
 
@@ -15,7 +13,6 @@
   - [`useDispatch()`](#useDispatch)
   - [`connect()`](#connect)
   - [`useAdd()`](#useAdd)
-  - [`useDispatcher()`](#useDispatcher)
 - [Example](#example)
 - [FAQ](#faq)
 - [License](#license)
@@ -149,19 +146,67 @@ const click = () => {
 
 ### `useDispatch`
 
-To do ...
+useDispatch returns the function you registered in a model effects,the only argument to the useDispatch() Hook is an object, the object must have an property named type, also you can set some other properties.
+The function returned by useDispatch is wrapped by an async function and also is injected with an object parameter,so that you can get the state、the function updates it and a selector which can select other models' state.
+```javascript
+//if your model is like this
+{
+  name:'login',
+  init:{
+    name:null,
+    age:null,
+  },
+  effects:{
+    // Defining an async function is recommended, but it is not required
+    async login({name,pass},{state,setState,select}){
+
+      // state: state.value is the state of login
+      // setState: function updates the login state, not partly
+      // select: its usage is as same as useModel
+
+      //ps: when the login function is called in your component like below, and you dont pass any argument to it, You can't write any other parameters except the parameters being injected
+      //so you code may like this: async login({state,setState,select}){}
+    }
+  }
+}
+
+// you may in your component write these
+
+const loginaction = useDispatch({ type:'login/login', otherproperty:''});
+//otherproperty is optional, if you set some other properties, you can get them in the injected argument
+// your code maybe like this   async login({name,pass},{state,setState,select, otherproperty }){}
+
+
+
+loginaction({name,pass}).then(data => {
+  // do something
+}).catch(error => {
+  // do something
+}).finally(() => {
+  // do something
+})
+
+```
 
 ### `connect`
 
-To do ...
+If you are obsessed with writing classes and have no other state management tools, I provide the connect decorator
+the connect function receives two arguments, the first is required and the second is optional.
+the first argument is useModel's argument
+the second argument is useDispatch' argument
+In your class component,you will have three new props: hookState、setHookState、dispatch
 
 ### `useAdd`
 
-To do ...
+If you want to dynamically inject model state, you can use it.
+useAdd has three arguments: name initdata, once
 
-### `useDispatcher`
-
-To do ...
+```javascript
+useAdd(name, initdate, once)
+// name is the model's name
+// initdata can be an object or function
+// once decided whether to execute only once just like componentDidMount
+```
 
 
 

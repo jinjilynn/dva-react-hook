@@ -42,7 +42,6 @@ const dev = {
             {
                 test: /\.js$/,
                 exclude: /node_modules/,
-                // include: [path.resolve(dir, 'node_modules/parse5')],
                 loader: "babel-loader",
                 options: {
                     presets: [
@@ -58,8 +57,7 @@ const dev = {
                         ["@babel/plugin-transform-runtime", { "corjs": 2 }],
                         "@babel/plugin-syntax-dynamic-import",
                         ["@babel/plugin-proposal-decorators", { "legacy": true }],
-                        "@babel/plugin-proposal-class-properties",
-                        ["import", { "libraryName": "antd", "libraryDirectory": "es", "style": "css" }]
+                        "@babel/plugin-proposal-class-properties"
                     ]
                 }
             },

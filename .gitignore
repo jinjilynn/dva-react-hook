@@ -3,6 +3,9 @@
 # dependencies
 /node_modules
 /webpack
+/example/node_modules
+/example/webpack/node_modules
+/src/indexx.js
 
 # production
 /dist

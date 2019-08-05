@@ -1,7 +1,7 @@
 {
   "name": "dva-react-hook",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.0.2",
+  "description": "React Hooks based, imitating dva, lightweight framework",
   "main": "/dist/index.js",
   "scripts": {},
   "keywords": [
@@ -16,14 +16,13 @@
     "email": "jinjilin@hotmail.com"
   },
   "license": "MIT",
-  "devDependencies": {
-    "react": "^16.8.6"
-  },
+  "repository": "https://github.com/jinjilynn/dva-react-hook",
   "files": [
     "dist"
   ],
   "dependencies": {
     "@babel/runtime": "^7.5.5",
+    "core-js": "^2.5.7",
     "react": "^16.8.6"
   }
 }

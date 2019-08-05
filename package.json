@@ -1,6 +1,6 @@
 {
   "name": "dva-react-hook",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "React Hooks based, imitating dva, lightweight framework",
   "main": "/dist/index.js",
   "scripts": {},

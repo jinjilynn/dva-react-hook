@@ -64,7 +64,7 @@ export default function Counter(){
     const [ { value: count }, setCount ] = useModel('apples/count');
 
     const eat = () => {
-        setCount(count--)
+        setCount(count - 1)
     }
 
     return <div>
@@ -193,10 +193,10 @@ loginaction({name,pass}).then(data => {
 
 ### `connect`
 
-If you are obsessed with writing classes and have no other state management tools, I provide the connect decorator
-the connect function receives two arguments, the first is required and the second is optional.
-the first argument is useModel's argument
-the second argument is useDispatch' argument
+If you are obsessed with writing classes and have no other state management tools, I provide the connect decorator.
+The connect decorator receives two arguments, the first is required and the second is optional.
+The first argument is useModel's argument
+The second argument is useDispatch' argument
 In your class component,you will have three new props: hookState、setHookState、dispatch
 
 ### `useAdd`

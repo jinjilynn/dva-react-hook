@@ -1,5 +1,5 @@
 # dva-react-hook
-[![NPM](https://img.shields.io/badge/npm-v1.0.2-blue)](https://www.npmjs.com/package/dva-react-hook)
+[![NPM](https://img.shields.io/badge/npm-v1.0.3-blue)](https://www.npmjs.com/package/dva-react-hook)
 > React Hooks based, imitating dva, lightweight framework.
 
 ## Table of Contents

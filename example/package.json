@@ -1,0 +1,18 @@
+{
+  "name": "dva-react-hook-example",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {},
+  "author": "jinjilin@hotmail.com",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/runtime": "^7.5.5",
+    "dva-react-hook": "^1.0.3",
+    "history": "^4.9.0",
+    "react": "~16.8.6",
+    "react-dom": "~16.8.6",
+    "react-router-dom": "^5.0.1",
+    "redbox-react": "~1.6.0"
+  }
+}

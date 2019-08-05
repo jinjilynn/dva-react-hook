@@ -1,5 +1,6 @@
 # dva-react-hook
 [![NPM](https://img.shields.io/badge/npm-v1.0.3-blue)](https://www.npmjs.com/package/dva-react-hook)
+[![SIZE](https://img.shields.io/badge/size-842bytes-green)]
 > React Hooks based, imitating dva, lightweight framework.
 
 ## Table of Contents
@@ -33,6 +34,7 @@ npm install --save dva-react-hook
 //
 // Bootstrap your app
 //
+import React from 'react';
 import { Provider } from 'dva-react-hook';
 const initState = {
   name:'Lynn',
@@ -54,9 +56,10 @@ ReactDOM.render(
 //
 // Individual components
 //
-import { useModel } ffrom 'dva-react-hook';
+import React from 'react';
+import { useModel } from 'dva-react-hook';
 
-export function Counter(){
+export default function Counter(){
     const [ { value: name } ] = useModel('name');
     const [ { value: count }, setCount ] = useModel('apples/count');
 
@@ -64,10 +67,10 @@ export function Counter(){
         setCount(count--)
     }
 
-    return (
+    return <div>
         <span> { name } has { count } apples</span>
         <button onClick={eat}>Eat One</button>
-  );
+    </div>    
 }
 
 ```

@@ -273,7 +273,7 @@ export function connect(model,action){
   return (Component) => {
     return (props) =>{
       const [ state,setState ] = useModel(model);
-      const dispatch = useDispatch(action);
+      const dispatch = action ? useDispatch(action) : null;
       return <Component hookState = { state } setHookState={ setState } dispatch={dispatch} {...props}/>
     }
   }

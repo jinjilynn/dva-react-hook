@@ -198,6 +198,10 @@ The first argument is useModel's argument
 The second argument is useDispatch' argument
 In your class component,you will have three new props: hookState、setHookState、dispatch
 
+```javascript
+@connect('list/page',{ type: 'liat/fetch' })
+```
+
 ### `useAdd`
 
 If you want to dynamically inject model state, you can use it.

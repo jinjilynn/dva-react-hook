@@ -14,7 +14,7 @@
   - [`useDispatch()`](#useDispatch)
   - [`connect()`](#connect)
   - [`useAdd()`](#useAdd)
-- [Example](#example)
+- [Example](#Example)
 - [License](#license)
 
 ## Install

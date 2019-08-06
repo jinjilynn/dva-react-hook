@@ -210,7 +210,7 @@ useAdd(name, initdate, once)
 // once decided whether to execute only once just like componentDidMount
 ```
 
-###Example
+##Example
 
 - [`example`](https://github.com/jinjilynn/dva-react-hook/tree/master/example)
 

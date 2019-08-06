@@ -115,7 +115,7 @@ models  | Function \| Array  |  Function should return an array.You can load mod
 ```javascript
 {
     name:'some-name',
-    init: Function | Object, //optional --default value is {}
+    init: Function | Object | Number | Array | ..., //optional --default value is {}
     effects:{
       fetch: async({state:{value},setState,select}) => {
       }

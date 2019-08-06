@@ -1,7 +1,5 @@
 Project init
 
-- cd example
-
 - npm install
 
 - cd webpack 

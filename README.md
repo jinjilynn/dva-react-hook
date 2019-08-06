@@ -15,7 +15,6 @@
   - [`connect()`](#connect)
   - [`useAdd()`](#useAdd)
 - [Example](#example)
-- [FAQ](#faq)
 - [License](#license)
 
 ## Install
@@ -211,9 +210,9 @@ useAdd(name, initdate, once)
 // once decided whether to execute only once just like componentDidMount
 ```
 
+###Example
 
-
-
+- [`example`](https://github.com/jinjilynn/dva-react-hook/tree/master/example)
 
 ## License
 

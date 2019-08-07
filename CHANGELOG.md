@@ -1,5 +1,12 @@
 # Changelog for dva-react-hook
 
+## 1.1.4
+
+Aug 7, 2019
+
+- fix export default is Provider 
+
+
 ## 1.1.3
 
 Aug 7, 2019

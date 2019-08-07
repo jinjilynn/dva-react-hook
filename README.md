@@ -39,7 +39,8 @@ var dvaHook = require('dva-react-hook');
 // Bootstrap your app
 //
 import React from 'react';
-import { Provider } from 'dva-react-hook';
+import Provider from 'dva-react-hook';
+
 const initState = {
   name:'Lynn',
   apples:{
@@ -110,6 +111,9 @@ render  | Function  |  This allows for convenient inline rendering and wrapping,
 models  | Function \| Array  |  Function should return an array.You can load model asynchronously with ’import‘ or synchronously with array
 
 ```tsx
+import { Dynamic } from 'dva-react-hook';
+
+
 <Dynamic component={ReactNode} />
 <Dynamic render={() => <App />} />
 <Dynamic render={() => import('url')} />
@@ -139,6 +143,9 @@ You can take the value when you define it, or take the value until you use it. T
 
 
 ```javascript
+import { useModel } from 'dva-react-hook';
+
+
 const [ user, setUser ] = useModel('user');
 const [ { value: total } ] = useModel('list/total');
 const [ { value: page }, setPage ] = useModel('list/page');
@@ -204,6 +211,8 @@ The second argument is as same as useDispatch's argument
 In your class component,you will have three new props: hookState、setHookState、dispatch
 
 ```javascript
+import { connect } from 'dva-react-hook';
+
 @connect('list/page',{ type: 'liat/fetch' })
 ```
 
@@ -213,6 +222,8 @@ If you want to dynamically inject model state, you can use it.
 useAdd has three arguments: name initdata, once
 
 ```javascript
+import { useAdd } from 'dva-react-hook';
+
 useAdd(name, initdate, once)
 // name is the model's name
 // initdata can be an object or function

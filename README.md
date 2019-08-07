@@ -1,5 +1,5 @@
 # dva-react-hook
-[![NPM](https://img.shields.io/badge/npm-v1.0.9-blue)](https://www.npmjs.com/package/dva-react-hook)
+[![NPM](https://img.shields.io/badge/npm-v1.1.2-blue)](https://www.npmjs.com/package/dva-react-hook)
 [![size](https://img.shields.io/badge/size-17KB-green)]()
 > React Hooks based, imitating dva, lightweight framework.
 
@@ -25,6 +25,11 @@ yarn add dva-react-hook
 
 # NPM
 npm install --save dva-react-hook
+```
+
+## In Node.js
+```javascript
+var dvaHook = require('dva-react-hook');
 ```
 
 ## Quick Start

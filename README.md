@@ -139,7 +139,7 @@ You can useModel hook to inject a model state into a component.
 The only argument to the useModel() Hook is state path.
 It returns a pair of values: an object and a function that updates the model state.
 The object has a getter named value, value returns the current model state defined by the path.
-You can take the value when you define it, or take the value until you use it. The difference is that when you take the second action, you can get the updated value synchronously before the component is re-rendered. It is not recommended to do this when it is not absolutely necessary.
+You can take the value when you define it, or take the value until you use it. The difference is that when you take the second action, you can get the updated value synchronously before the component is re-rendered. It is not recommended to do this unless it is absolutely necessary.
 
 
 ```javascript
@@ -206,9 +206,9 @@ loginaction({name,pass}).then(data => {
 
 If you are obsessed with writing classes and have no other state management tools, I provide the connect decorator.
 The connect decorator receives two arguments, the first is required and the second is optional.
-The first argument is as same as  useModel's argument
-The second argument is as same as useDispatch's argument
-In your class component,you will have three new props: hookState、setHookState、dispatch
+The first argument is as same as  useModel's.
+The second argument is as same as useDispatch's.
+In your class component,you will have three new props: hookState、setHookState、dispatch.
 
 ```javascript
 import { connect } from 'dva-react-hook';

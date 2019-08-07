@@ -1,5 +1,5 @@
 # dva-react-hook
-[![NPM](https://img.shields.io/badge/npm-v1.1.2-blue)](https://www.npmjs.com/package/dva-react-hook)
+[![NPM](https://img.shields.io/badge/npm-v1.1.3-blue)](https://www.npmjs.com/package/dva-react-hook)
 [![size](https://img.shields.io/badge/size-17KB-green)]()
 > React Hooks based, imitating dva, lightweight framework.
 
@@ -199,8 +199,8 @@ loginaction({name,pass}).then(data => {
 
 If you are obsessed with writing classes and have no other state management tools, I provide the connect decorator.
 The connect decorator receives two arguments, the first is required and the second is optional.
-The first argument is useModel's argument
-The second argument is useDispatch' argument
+The first argument is as same as  useModel's argument
+The second argument is as same as useDispatch's argument
 In your class component,you will have three new props: hookState、setHookState、dispatch
 
 ```javascript

@@ -12,11 +12,11 @@ export default function useAdd(name, initdate, once){
     }
     useHState();
     const dispatch = useDispatcher()
-    if (runtime_state === undefined || dispatch === undefined) {
+    if (store.runtime_state === undefined || dispatch === undefined) {
       throw new Error('useAdd must be used within a Provider')
     }
-    if(runtime_state.hasOwnProperty(name)){
-      throw new Error(`you have already added the state name -- ${name}  before !`)
+    if(store.runtime_state.hasOwnProperty(name)){
+      console.warn(`you have already added the state name -- ${name}  before !`)
     }
     let data = initdate;
     if(typeof initdate === 'function'){

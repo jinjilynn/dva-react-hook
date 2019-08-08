@@ -2,6 +2,12 @@
 
 ## 1.1.4
 
+Aug 8, 2019
+
+- optimized
+
+## 1.1.4
+
 Aug 7, 2019
 
 - fix export default is Provider 

@@ -1,7 +1,7 @@
 # dva-react-hook
-[![NPM](https://img.shields.io/badge/npm-v1.1.4-blue)](https://www.npmjs.com/package/dva-react-hook)
+[![NPM](https://img.shields.io/badge/npm-v1.1.5-blue)](https://www.npmjs.com/package/dva-react-hook)
 [![size](https://img.shields.io/badge/size-17KB-green)]()
-> React Hooks based, imitating dva, lightweight framework.
+> React Hooks based, concise、lightweight framework.
 
 ## Table of Contents
 
@@ -135,11 +135,11 @@ import { Dynamic } from 'dva-react-hook';
 
 
 ### `useModel`
-You can useModel hook to inject a model state into a component.
+You can use useModel hook to inject a model state into a component.
 The only argument to the useModel() Hook is state path.
 It returns a pair of values: an object and a function that updates the model state.
-The object has a getter named value, value returns the current model state defined by the path.
-You can take the value when you define it, or take the value until you use it. The difference is that when you take the second action, you can get the updated value synchronously before the component is re-rendered. It is not recommended to do this unless it is absolutely necessary.
+The object returned has a getter named value, value returns the current model state defined by the path.
+You can take the value when you define it, or take the value until you use it. The difference is that when you take the second action, you will get the updated value synchronously before the component re-renders. It is not recommended to do this unless it is absolutely necessary.
 
 
 ```javascript
@@ -156,12 +156,12 @@ const click = () => {
   page // the value is not 1
 }
 ```
-##### ps: Usually when a context value is changed, all components that useContext will re-render, but this framework is unusual, so  if only used part of the state is changed, corresponding component will re-render.
+##### ps: Usually when a context value is changed, all components that useContext will re-render, but this framework is unusual, so if only used part of the state is changed, the corresponding component will re-render.
 
 ### `useDispatch`
 
 useDispatch returns the function you registered in a model effects,the only argument to the useDispatch() Hook is an object, the object must have an property named type, also you can set some other properties.
-The function returned by useDispatch is wrapped by an async function and also is injected with an object parameter,so that you can get the state、the function updates it and a selector which can select other models' state.
+The function returned by useDispatch is wrapped by an async function and also is injected with an object parameter,so that you can get the state of the model、the function updates it and a selector which can select other models' state and set other models' state.
 ```javascript
 //if your model is like this
 {
@@ -178,17 +178,19 @@ The function returned by useDispatch is wrapped by an async function and also is
       // setState: function updates the login state, not partly
       // select: its usage is as same as useModel
 
-      //ps: when the login function is called in your component like below, and you dont pass any argument to it, You can't write any other parameters except the parameters being injected
-      //so you code may like this: async login({state,setState,select}){}
+      //ps: when the login function is called like the this ( you dont pass any argument to it ) -- loginaction() in your component, You can't write any other parameters except the parameters being injected
+
+      //so your code may like this:  async login({state,setState,select}){}
     }
   }
 }
 
 // you may in your component write these
 
-const loginaction = useDispatch({ type:'login/login', otherproperty:''});
+const loginaction = useDispatch({ type:'login/login', otherproperties:''});
 //otherproperty is optional, if you set some other properties, you can get them in the injected argument
-// your code maybe like this   async login({name,pass},{state,setState,select, otherproperty }){}
+
+//so your code maybe like this   async login({name,pass},{state,setState,select, otherproperties }){}
 
 
 
@@ -205,7 +207,7 @@ loginaction({name,pass}).then(data => {
 ### `connect`
 
 If you are obsessed with writing classes and have no other state management tools, I provide the connect decorator.
-The connect decorator receives two arguments, the first is required and the second is optional.
+The connect decorator receives two arguments: the first is required and the second is optional.
 The first argument is as same as  useModel's.
 The second argument is as same as useDispatch's.
 In your class component,you will have three new props: hookState、setHookState、dispatch.
@@ -213,8 +215,23 @@ In your class component,you will have three new props: hookState、setHookState�
 ```javascript
 import { connect } from 'dva-react-hook';
 
-@connect('list/page',{ type: 'liat/fetch' })
+@connect('list/page',{ type: 'list/fetch' })
+
+class Demo extends React.Component{
+  componentDidMount(){
+    const page  = this.props.hookState;
+    this.props.dispatch(page);
+  }
+  render(){
+    return <div>
+      <span>{this.props.hookState}</span>
+      <div><Table /></div>
+    </div>
+  }
+}
 ```
+
+##### ps: each class component can only be injected by one props and one dispatch. This is entirely due to the single responsibility principle to make the components as clear and easy to understand as possible.
 
 ### `useAdd`
 

@@ -1,5 +1,5 @@
 # dva-react-hook
-[![NPM](https://img.shields.io/badge/npm-v1.1.5-blue)](https://www.npmjs.com/package/dva-react-hook)
+[![NPM](https://img.shields.io/badge/npm-v1.1.6-blue)](https://www.npmjs.com/package/dva-react-hook)
 [![size](https://img.shields.io/badge/size-17KB-green)]()
 > React Hooks based, concise、lightweight framework.
 
@@ -249,7 +249,7 @@ useAdd(name, initdate, once)
 
 ## Example
 
-- [`example`](https://github.com/jinjilynn/dva-react-hook/tree/master/example)
+- [`example`](https://github.com/jinjilynn/dva-hook-demo)
 
 ## License
 

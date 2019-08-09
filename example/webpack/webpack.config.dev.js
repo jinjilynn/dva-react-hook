@@ -110,11 +110,9 @@ const dev = {
         noInfo: false,
         overlay: true,
         hot: true,
-        //publicPath: config.output.publicPath,
         stats: {
             colors: true
         },
-        //contentBase: path.join(__dirname, "../src"),
         watchContentBase: true,
         historyApiFallback: true,
         open: true,

@@ -15,8 +15,10 @@ export default function reducer(state,action){
             ...store.runtime_state,
             [action.name]:action.data
           }
-          const track1 = Object.values(store.REFRESH_CACHE);
-          track1.forEach(it => {it && action.name === it._s && it.set(Math.random())});
+          if(!action.cancelUpdate){
+            const track1 = Object.values(store.REFRESH_CACHE);
+            track1.forEach(it => {it && action.name === it._s && it.set(Math.random())});
+          }
           return state
         case 'updateSet':
           const names = action.name.split('/');
@@ -30,8 +32,10 @@ export default function reducer(state,action){
             temp = temp[names[i]]
             i += 1;
           }
-          const track2 = Object.values(store.REFRESH_CACHE);
-          track2.forEach(it => {it && action.name === it._s && it.set(Math.random())});
+          if(!action.cancelUpdate){
+            const track2 = Object.values(store.REFRESH_CACHE);
+            track2.forEach(it => {it && action.name === it._s && it.set(Math.random())});
+          }
           return state
         default: {
                 throw new Error(`Unhandled action type: ${action.type}`)
@@ -51,10 +55,12 @@ export default function reducer(state,action){
             ...store.runtime_state,
             [action.name]: data
           }
-          const track3 = Object.values(store.REFRESH_CACHE);
-          track3.forEach(it => {
-            it && it._s.split('/').includes(action.name) && it.set(Math.random())
-          });
+          if(!action.cancelUpdate){
+            const track3 = Object.values(store.REFRESH_CACHE);
+            track3.forEach(it => {
+              it && it._s.split('/').includes(action.name) && it.set(Math.random())
+            });
+          }
           return state
         default: {
             throw new Error(`Unhandled action type: ${action.type}`)

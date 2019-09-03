@@ -1,5 +1,9 @@
 # Changelog for dva-react-hook
 
+## 1.1.8
+
+- add function that updates the model and does not cause an update of the corresponding component
+
 ## 1.1.7
 - bug state immutable
 ## 1.1.6

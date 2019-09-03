@@ -40,11 +40,12 @@ export default function useDispatch(action){
        throw new Error(`the effect named ${type[1]} must be a function`);
     }
     const effectwrapped = async (...rest) => {
-     return effect(...rest,{...others,state:Object.create({get value(){return clone(store.runtime_state[type[0]], true)}}),setState:(data) => {
+     return effect(...rest,{...others,state:Object.create({get value(){return clone(store.runtime_state[type[0]], true)}}),setState:(data,cancelUpdate) => {
        dispatch({
          type:'set',
          name:type[0],
-         data
+         data,
+         cancelUpdate
        })
      },
      select:(name) => {

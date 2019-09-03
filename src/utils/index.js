@@ -5,7 +5,7 @@ export function get(name,dispatch){
     }
     if(name.indexOf('/') === -1){
       return [
-        Object.create({get value(){return store.runtime_state[name]}}),
+        Object.create({get value(){return clone(store.runtime_state[name],true)}}),
         (value) => { dispatch({ type: 'coverSet',name, data: value, inner:store.inner })}
       ];
     }
@@ -31,9 +31,51 @@ export function get(name,dispatch){
             }
             i += 1;
           }
-          return r;
+          return clone(r,true);
         }
       }),
       (value) => { dispatch({ type: 'updateSet',name, data: value, inner:store.inner })}
     ]
   }
+
+  export function clone(obj, deep) {
+    if(Object.prototype.toString.call(obj) !== '[object Object]'){
+      return obj;
+    }
+    return extend({}, deep, obj);
+  };
+  
+  function extend(obj, deep) {
+    var argsStart,
+      args,
+      deepClone;
+  
+    if (typeof deep === 'boolean') {
+      argsStart = 2;
+      deepClone = deep;
+    } else {
+      argsStart = 1;
+      deepClone = true;
+    }
+  
+    for (var i = argsStart; i < arguments.length; i++) {
+      var source = arguments[i];
+  
+      if (source) {
+        for (var prop in source) {
+          if (deepClone && source[prop] && source[prop].constructor === Object) {
+            if (!obj[prop] || obj[prop].constructor === Object) {
+              obj[prop] = obj[prop] || {};
+              extend(obj[prop], deepClone, source[prop]);
+            } else {
+              obj[prop] = source[prop];
+            }
+          } else {
+            obj[prop] = source[prop];
+          }
+        }
+      }
+    }
+  
+    return obj;
+  };

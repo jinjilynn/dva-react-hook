@@ -1,6 +1,9 @@
 # Changelog for dva-react-hook
 
-## 1.1.4
+## 1.1.7
+- bug state immutable
+## 1.1.6
+## 1.1.5
 
 Aug 8, 2019
 

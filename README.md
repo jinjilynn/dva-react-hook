@@ -1,6 +1,6 @@
 # dva-react-hook
-[![NPM](https://img.shields.io/badge/npm-v1.1.8-blue)](https://www.npmjs.com/package/dva-react-hook)
-[![size](https://img.shields.io/badge/size-17KB-green)]()
+[![NPM](https://img.shields.io/badge/npm-v1.1.9-blue)](https://www.npmjs.com/package/dva-react-hook)
+[![size](https://img.shields.io/badge/size-14KB-green)]()
 > React Hooks based, concise、lightweight framework.
 
 ## Table of Contents
@@ -137,9 +137,11 @@ import { Dynamic } from 'dva-react-hook';
 ### `useModel`
 You can use useModel hook to inject a model state into a component.
 The only argument to the useModel() Hook is state path.
-It returns a pair of values: an object、a function that updates the model state and causes an update of the corresponding component、a function that updates the model and does not cause an update of the corresponding component
-The object returned has a getter named value, value returns the current model state defined by the path.
+It returns a pair of values: an object and a function that updates the model state.
+
+1. The object returned has a getter named value, value returns the current model state defined by the path.
 You can take the value when you define it, or take the value until you use it. The difference is that when you take the second action, you will get the updated value synchronously before the component re-renders. It is not recommended to do this unless it is absolutely necessary.
+2. The function returned can be passed in the second argument(optional) of type boolean, if the parameter is true then it will not cause the corresponding component to be updated.
 
 
 ```javascript
@@ -148,13 +150,13 @@ import { useModel } from 'dva-react-hook';
 
 const [ user, setUser ] = useModel('user');
 const [ { value: total } ] = useModel('list/total');
-const [ { value: page }, setPage, setPageNotUpdated ] = useModel('list/page');
+const [ { value: page }, setPage ] = useModel('list/page');
 const click = () => {
   setUser('dva-hook');
   user.value // the value is dva-hook
   setPage(1)
   page // the value is not 1
-  setPageNotUpdated(2) // This does not cause an update of the component
+  setPage(2, true) // This does not cause an update of the component
 }
 ```
 ##### ps: Usually when a context value is changed, all components that useContext will re-render, but this framework is unusual, so if only used part of the state is changed, the corresponding component will re-render.
@@ -176,7 +178,7 @@ The function returned by useDispatch is wrapped by an async function and also is
     async login({name,pass},{state,setState,select}){
 
       // state: state.value is the state of login
-      // setState: function updates the login state, not partly.The second parameter you can pass in a value of type boolean, if the value of the second parameter passed in is true, the corresponding component will not be updated.
+      // setState: function updates the login state, not partly.The second parameter you can pass in a value of type boolean, if the value of the second parameter passed in is ’true‘, the corresponding component will not be updated.
       // select: its usage is as same as useModel
 
       //ps: when the login function is called like the this ( you dont pass any argument to it ) -- loginaction() in your component, You can't write any other parameters except the parameters being injected

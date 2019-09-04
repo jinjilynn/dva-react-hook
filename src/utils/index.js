@@ -6,8 +6,7 @@ export function get(name,dispatch){
     if(name.indexOf('/') === -1){
       return [
         Object.create({get value(){return clone(store.runtime_state[name],true)}}),
-        (value) => { dispatch({ type: 'coverSet',name, data: value, inner:store.inner })},
-        (value) => { dispatch({ type: 'coverSet',name, data: value, inner:store.inner,cancelUpdate:true })}
+        (value, cancelUpdate) => { dispatch({ type: 'coverSet',name, data: value, inner:store.inner, cancelUpdate })}
       ];
     }
     const names = name.split('/');
@@ -35,8 +34,7 @@ export function get(name,dispatch){
           return clone(r,true);
         }
       }),
-      (value) => { dispatch({ type: 'updateSet',name, data: value, inner:store.inner })},
-      (value) => { dispatch({ type: 'updateSet',name, data: value, inner:store.inner,cancelUpdate:true })}
+      (value, cancelUpdate) => { dispatch({ type: 'updateSet',name, data: value, inner:store.inner, cancelUpdate })}
     ]
   }
 

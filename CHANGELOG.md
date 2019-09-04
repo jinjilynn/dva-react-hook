@@ -1,5 +1,9 @@
 # Changelog for dva-react-hook
 
+## 1.1.9
+
+- remove the function instead of an argument
+
 ## 1.1.8
 
 - add function that updates the model and does not cause an update of the corresponding component

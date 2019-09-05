@@ -153,7 +153,7 @@ You can take the value when you define it, or take the value until you use it. T
 Property|Description|Type
 :--:|:--:|:--:
 cancelUpdate  | If the value is true, the corresponding component update will not be triggered, otherwise the update will be triggered.| boolean
-callbacks | After the function that updates state is executed, the callback(defined in the callbacks property of the same Model) specified by 'callbacks' perperty is executed  |  string or Array
+callbacks | After the function that updates state is executed, the callback(defined in the callbacks property of the same Model) specified by 'callbacks' perperty is executed  |  string \| Array
 
 
 ```javascript

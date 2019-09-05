@@ -1,5 +1,5 @@
 # dva-react-hook
-[![NPM](https://img.shields.io/badge/npm-v1.1.9-blue)](https://www.npmjs.com/package/dva-react-hook)
+[![NPM](https://img.shields.io/badge/npm-v1.2.0-blue)](https://www.npmjs.com/package/dva-react-hook)
 [![size](https://img.shields.io/badge/size-14KB-green)]()
 > React Hooks based, concise、lightweight framework.
 
@@ -129,6 +129,13 @@ import { Dynamic } from 'dva-react-hook';
       fetch: async({state:{value},setState,select}) => {
       }
     }
+    //optional
+    callbacks:{
+      'xxxx': (value) => {
+        // 
+        // do something with value
+      }
+    }
 }
 ```
 
@@ -141,7 +148,12 @@ It returns a pair of values: an object and a function that updates the model sta
 
 1. The object returned has a getter named value, value returns the current model state defined by the path.
 You can take the value when you define it, or take the value until you use it. The difference is that when you take the second action, you will get the updated value synchronously before the component re-renders. It is not recommended to do this unless it is absolutely necessary.
-2. The function returned can be passed in the second argument(optional) of type boolean, if the parameter is true then it will not cause the corresponding component to be updated.
+2. The function returned can be passed in the second argument(optional) of type Object
+
+Property|Description|Type
+:--:|:--:|:--:
+cancelUpdate  | If the value is true, the corresponding component update will not be triggered, otherwise the update will be triggered.| boolean
+callbacks | After the function that updates state is executed, the callback(defined in the callbacks property of the same Model) specified by 'callbacks' perperty is executed  |  string | array
 
 
 ```javascript
@@ -156,7 +168,7 @@ const click = () => {
   user.value // the value is dva-hook
   setPage(1)
   page // the value is not 1
-  setPage(2, true) // This does not cause an update of the component
+  setPage(2, { cancelUpdate: true }) // This does not cause an update of the component
 }
 ```
 ##### ps: Usually when a context value is changed, all components that useContext will re-render, but this framework is unusual, so if only used part of the state is changed, the corresponding component will re-render.

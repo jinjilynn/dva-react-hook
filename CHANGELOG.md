@@ -1,5 +1,10 @@
 # Changelog for dva-react-hook
 
+## 1.2.0
+
+- add callbacks after set state, and change parameter form of useModel
+
+
 ## 1.1.9
 
 - remove the function instead of an argument

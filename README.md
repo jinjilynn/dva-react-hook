@@ -153,7 +153,7 @@ You can take the value when you define it, or take the value until you use it. T
 Property|Description|Type
 :--:|:--:|:--:
 cancelUpdate  | If the value is true, the corresponding component update will not be triggered, otherwise the update will be triggered.| boolean
-callbacks | After the function that updates state is executed, the callback(defined in the callbacks property of the same Model) specified by 'callbacks' perperty is executed  |  string | array
+callbacks | After the function that updates state is executed, the callback(defined in the callbacks property of the same Model) specified by 'callbacks' perperty is executed  |  string || Array
 
 
 ```javascript
@@ -169,6 +169,8 @@ const click = () => {
   setPage(1)
   page // the value is not 1
   setPage(2, { cancelUpdate: true }) // This does not cause an update of the component
+
+  setPage(2, { callbacks: 'xxx' }) // the callback named xxx in the model list will be executed
 }
 ```
 ##### ps: Usually when a context value is changed, all components that useContext will re-render, but this framework is unusual, so if only used part of the state is changed, the corresponding component will re-render.

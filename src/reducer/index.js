@@ -17,7 +17,12 @@ export default function reducer(state, action) {
         }
         if (!action.cancelUpdate) {
           const track1 = Object.values(store.REFRESH_CACHE);
-          track1.forEach(it => { it && action.name === it._s && it.set(Math.random()) });
+          track1.forEach(it => {
+            if(it){
+              const c = it._s.split('/');
+              action.name === c[0] && it.set(Math.random()) 
+            }
+          });
         }
         return state
       case 'updateSet':

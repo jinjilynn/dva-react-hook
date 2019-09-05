@@ -1,5 +1,9 @@
 # Changelog for dva-react-hook
 
+## 1.2.1
+
+- bug  when the entire state is updated, the component that registered the local property of the state  is not updated. 
+
 ## 1.2.0
 
 - add callbacks after set state, and change parameter form of useModel

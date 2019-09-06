@@ -8,7 +8,7 @@ function removeConnect(uid){
     delete store.REFRESH_CACHE[uid];
 }
 
-export default function useModel(name){
+export default function useModel(name, update){
     if(typeof name !== 'string'){
       throw new Error('useModel\'s argument must be a string')
     }
@@ -16,9 +16,9 @@ export default function useModel(name){
     const [state, setState] = React.useState(Math.random());
     React.useEffect(() => {
       const uid = `$$track_uid${Math.random().toString().replace(/./,'')}`
-      store.REFRESH_CACHE[uid] = {_s:name,set:setState};
+      !update && (store.REFRESH_CACHE[uid] = {_s:name,set:setState});
       return () => {
-        removeConnect(uid);
+        !update && removeConnect(uid);
       }
     },[])
     const dispatch = useDispatcher()

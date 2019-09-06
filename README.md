@@ -1,5 +1,5 @@
 # dva-react-hook
-[![NPM](https://img.shields.io/badge/npm-v1.2.1-blue)](https://www.npmjs.com/package/dva-react-hook)
+[![NPM](https://img.shields.io/badge/npm-v1.2.2-blue)](https://www.npmjs.com/package/dva-react-hook)
 [![size](https://img.shields.io/badge/size-14KB-green)]()
 > React Hooks based, concise、lightweight framework.
 
@@ -143,7 +143,9 @@ import { Dynamic } from 'dva-react-hook';
 
 ### `useModel`
 You can use useModel hook to inject a model state into a component.
-The only argument to the useModel() Hook is state path.
+##### ps: Usually when a context value is changed, all components that useContext will re-render, but this framework is unusual, so only if the corresponding state introduced by it changes, the component will be re-rendered.
+
+The necessary parameter to the useModel() Hook is a state path of string type.
 It returns a pair of values: an object and a function that updates the model state.
 
 1. The object returned has a getter named value, value returns the current model state defined by the path.
@@ -155,6 +157,7 @@ Property|Description|Type
 cancelUpdate  | If the value is true, the corresponding component update will not be triggered, otherwise the update will be triggered.| boolean
 callbacks | After the function that updates state is executed, the callback(defined in the callbacks property of the same Model) specified by 'callbacks' perperty is executed  |  string \| Array
 
+The second optional parameter to the useModel() is a boolean type, its default value is false, but you can give a 'true'. If its value is true, then the component using this useModel will not be re-rendered when the state specified by the first parameter changes. But this kind of behavior I strongly recommend is not recommended because it may cause logical confusion，unless it is absolutely necessary.
 
 ```javascript
 import { useModel } from 'dva-react-hook';
@@ -173,7 +176,7 @@ const click = () => {
   setPage(2, { callbacks: 'xxx' }) // the callback named xxx in the model list will be executed
 }
 ```
-##### ps: Usually when a context value is changed, all components that useContext will re-render, but this framework is unusual, so if only used part of the state is changed, the corresponding component will re-render.
+
 
 ### `useDispatch`
 

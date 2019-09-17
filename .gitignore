@@ -4,8 +4,6 @@
 /node_modules
 /webpack
 
-# production
-/dist
 
 # misc
 .DS_Store

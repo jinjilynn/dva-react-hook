@@ -1,6 +1,6 @@
 {
   "name": "dva-react-hook",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "React Hooks based, concise、lightweight framework",
   "main": "dist/index.js",
   "scripts": {},
@@ -23,6 +23,7 @@
     "dist"
   ],
   "dependencies": {
+    "clone": "^2.1.2",
     "react": "^16.8.6"
   }
 }

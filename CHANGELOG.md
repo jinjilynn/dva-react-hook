@@ -1,5 +1,9 @@
 # Changelog for dva-react-hook
 
+## 1.2.3
+
+- add clone
+
 ## 1.2.2
 
 - add second parameter to useModel

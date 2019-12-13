@@ -1,4 +1,6 @@
 import store from '../store';
+import clone from 'clone';
+
 export function get(name, dispatch) {
   if (typeof name !== 'string') {
     throw new Error('name must be a string')
@@ -70,46 +72,3 @@ function getPartValue(names) {
   }
   return clone(r, true);
 }
-
-
-export function clone(obj, deep) {
-  if (Object.prototype.toString.call(obj) !== '[object Object]') {
-    return obj;
-  }
-  return extend({}, deep, obj);
-};
-
-function extend(obj, deep) {
-  var argsStart,
-    args,
-    deepClone;
-
-  if (typeof deep === 'boolean') {
-    argsStart = 2;
-    deepClone = deep;
-  } else {
-    argsStart = 1;
-    deepClone = true;
-  }
-
-  for (var i = argsStart; i < arguments.length; i++) {
-    var source = arguments[i];
-
-    if (source) {
-      for (var prop in source) {
-        if (deepClone && source[prop] && source[prop].constructor === Object) {
-          if (!obj[prop] || obj[prop].constructor === Object) {
-            obj[prop] = obj[prop] || {};
-            extend(obj[prop], deepClone, source[prop]);
-          } else {
-            obj[prop] = source[prop];
-          }
-        } else {
-          obj[prop] = source[prop];
-        }
-      }
-    }
-  }
-
-  return obj;
-};

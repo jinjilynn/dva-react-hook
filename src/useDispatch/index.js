@@ -1,7 +1,8 @@
 import useHState from '../useHState';
 import useDispatcher from '../useDispatcher';
 import store from '../store';
-import { get, clone, execBack } from '../utils';
+import { get, execBack } from '../utils';
+import clone from 'clone';
 
 export default function useDispatch(action) {
    if (Object.prototype.toString.call(action) !== '[object Object]') {

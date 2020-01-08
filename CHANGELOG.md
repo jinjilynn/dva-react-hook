@@ -1,5 +1,9 @@
 # Changelog for dva-react-hook
 
+## 1.2.4
+
+- Optimising connect 
+
 ## 1.2.3
 
 - add clone

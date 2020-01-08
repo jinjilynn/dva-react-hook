@@ -1,6 +1,6 @@
 # dva-react-hook
-[![NPM](https://img.shields.io/badge/npm-v1.2.3-blue)](https://www.npmjs.com/package/dva-react-hook)
-[![size](https://img.shields.io/badge/size-40KB-green)]()
+[![NPM](https://img.shields.io/badge/npm-v1.2.4-blue)](https://www.npmjs.com/package/dva-react-hook)
+[![size](https://img.shields.io/badge/size-78KB-green)]()
 > React Hooks based, concise、lightweight framework.
 
 ## Table of Contents
@@ -229,18 +229,20 @@ loginaction({name,pass}).then(data => {
 If you are obsessed with writing classes and have no other state management tools, I provide the connect decorator.
 The connect decorator receives two arguments: the first is required and the second is optional.
 The first argument is as same as  useModel's.
-The second argument is as same as useDispatch's.
-In your class component,you will have three new props: hookState、setHookState、dispatch.
+The second argument is an object that has 'name' and 'action' properties
+In your class component,you will have three new props: xxxState,setXXX and the value of the name property
 
 ```javascript
 import { connect } from 'dva-react-hook';
 
-@connect('list/page',{ type: 'list/fetch' })
-
+@connect('list/page',{ name:'dispatch1', action: { type: 'list/fetch' } });
+@connect('property',{ name:'dispatch2', action: { type: 'space/fetch' } })
+// You can call the connect decorator multiple times to inject multiple actions and models
 class Demo extends React.Component{
   componentDidMount(){
     const page  = this.props.hookState;
-    this.props.dispatch(page);
+    this.props.dispatch1(page);
+    this.props.dispatch2(page);
   }
   render(){
     return <div>

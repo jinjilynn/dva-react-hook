@@ -1,5 +1,9 @@
 # Changelog for dva-react-hook
 
+## 1.2.5
+
+- reduce volume
+
 ## 1.2.4
 
 - Optimising connect 

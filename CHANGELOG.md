@@ -1,5 +1,9 @@
 # Changelog for dva-react-hook
 
+## 1.2.6
+
+- polyfilled
+
 ## 1.2.5
 
 - reduce volume

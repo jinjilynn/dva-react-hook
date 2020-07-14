@@ -1,9 +1,8 @@
 import React from 'react';
 import useDispatcher from '../useDispatcher';
-import useHState from '../useHState';
 import store from '../store';
 
-function registeReducers(_, dispatch){
+export function registeReducers(_, dispatch){
     if(Object.prototype.toString.call(_) !== '[object Object]'){
       throw new Error('your model must be an object');
     }
@@ -40,7 +39,6 @@ function registeReducers(_, dispatch){
 function Dynamic(props){
     const [state,setMount] = React.useState({mounted: false,component: null});
     const dispatch = useDispatcher();
-    useHState()
     const {models,renderBefore,render,component,...rest} = props;
     React.useEffect(() => {
       typeof renderBefore === 'function' && renderBefore();

@@ -1,4 +1,4 @@
-import useHState from '../useHState';
+
 import useDispatcher from '../useDispatcher';
 import store from '../store';
 import { get, execBack } from '../utils';
@@ -17,7 +17,6 @@ export default function useDispatch(action) {
    if (action.type.indexOf('/') === -1) {
       throw new Error('you must do some effects in your type');
    }
-   useHState();
    const dispatch = useDispatcher();
 
    let { type, ...others } = action;

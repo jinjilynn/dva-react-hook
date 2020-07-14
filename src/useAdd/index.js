@@ -1,5 +1,4 @@
 import React from 'react';
-import useHState from '../useHState';
 import useDispatcher from '../useDispatcher';
 import store from '../store';
 
@@ -10,7 +9,6 @@ export default function useAdd(name, initdate, once){
     if(name.length === 0){
       throw new Error('name can not be empty')
     }
-    useHState();
     const dispatch = useDispatcher()
     if (store.runtime_state === undefined || dispatch === undefined) {
       throw new Error('useAdd must be used within a Provider')

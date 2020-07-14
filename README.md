@@ -153,7 +153,7 @@ import { Dynamic } from 'dva-react-hook';
 <Dynamic models={() => [import('url1'),import('url2'),...]} />
 <Dynamic models={[model-object,model-object,...] />
 ```
-### `Model`:
+### `Model`
 ```javascript
 {
     name:'some-name',

@@ -1,5 +1,9 @@
 # Changelog for dva-react-hook
 
+## 1.2.8
+
+- Fix the problem of state loss when you use Provider multiple times
+
 ## 1.2.6
 
 - polyfilled

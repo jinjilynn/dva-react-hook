@@ -3,7 +3,7 @@ import store from '../store';
 import reducer from '../reducer';
 import { registeReducers } from '../dynamic';
 function initState($i) {
-  store.runtime_state = $i;
+  store.runtime_state = Object.assign($i, store.runtime_state);
   return $i;
 }
 function Provider({ models, children, ...rest }) {

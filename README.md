@@ -1,6 +1,6 @@
 # dva-react-hook
-[![NPM](https://img.shields.io/badge/npm-v1.2.7-blue)](https://www.npmjs.com/package/dva-react-hook)
-[![size](https://img.shields.io/badge/size-78KB-green)]()
+[![NPM](https://img.shields.io/badge/npm-v1.2.8-blue)](https://www.npmjs.com/package/dva-react-hook)
+[![size](https://img.shields.io/badge/size-79KB-green)]()
 > React Hooks based, concise、lightweight framework.
 
 ## Table of Contents

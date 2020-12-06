@@ -15,9 +15,9 @@ export function registeReducers(_, dispatch){
     if(_.name.length === 0){
       throw new Error('name can not be empty')
     }
-    if(store.runtime_state.hasOwnProperty(_.name)){
-      console.warn(`registed failed, ${_.name} model has been registed,please change another name`)
-    }
+    // if(store.runtime_state.hasOwnProperty(_.name)){
+    //   console.warn(`registed failed, ${_.name} model has been registed,please change another name`)
+    // }
     if (!store.MODELS[_.name] && !store.runtime_state.hasOwnProperty(_.name)) {
         store.MODELS[_.name] = _;
         let data = {};

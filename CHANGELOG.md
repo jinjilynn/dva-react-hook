@@ -1,8 +1,10 @@
 # Changelog for dva-react-hook
+## 1.3.0
 
+- sharing state when call Provider in different palces in different projects
 ## 1.2.9
 
-- multiple projects sharing state
+- sharing state when call Provider in different palces in the same project
 
 ## 1.2.8
 

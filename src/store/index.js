@@ -1,18 +1,17 @@
-import React from 'react'
-
 if (!window['dva_react_hook_sotre']) {
    const inner = Symbol();
-   const StateContext = React.createContext();
-   const DispatchContext = React.createContext();
    const MODELS = {};
    const REFRESH_CACHE = {};
    let runtime_state = undefined;
+   let REDUCER;
+   let dispatch;
    window['dva_react_hook_sotre'] = {
+      dispatch,
       inner,
-      StateContext,
-      DispatchContext,
       MODELS,
       REFRESH_CACHE,
+      REDUCER,
+      isDispatching: false,
       runtime_state
    };
 };

@@ -16,4 +16,6 @@ if (!window['dva_react_hook_sotre']) {
    };
 };
 
-export default window['dva_react_hook_sotre'];
+const store = window['dva_react_hook_sotre'];
+
+export default store;

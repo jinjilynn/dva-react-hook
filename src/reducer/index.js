@@ -63,7 +63,7 @@ export default function reducer(state, action) {
         if (!action.cancelUpdate) {
           const track3 = Object.values(store.REFRESH_CACHE);
           track3.forEach(it => {
-            it && it._s.split('/').includes(action.name) && it.set(Math.random())
+            it && it._s.split('/')[0] === (action.name) && it.set(Math.random())
           });
         }
         return state

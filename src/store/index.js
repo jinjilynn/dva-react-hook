@@ -2,6 +2,13 @@ if (!window['dva_react_hook_sotre']) {
    const inner = Symbol();
    const MODELS = {};
    const REFRESH_CACHE = {};
+   const isDispatching = {
+      dispatching: false,
+      name: null
+   };
+   const dispatch_queue = {
+      
+   };
    let runtime_state = undefined;
    let REDUCER;
    let dispatch;
@@ -11,8 +18,9 @@ if (!window['dva_react_hook_sotre']) {
       MODELS,
       REFRESH_CACHE,
       REDUCER,
-      isDispatching: false,
-      runtime_state
+      isDispatching,
+      runtime_state,
+      dispatch_queue
    };
 };
 

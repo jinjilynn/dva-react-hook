@@ -1,4 +1,8 @@
 # Changelog for dva-react-hook
+## 1.3.2
+
+- add queue caching dispatch when multiple dispatchs are triggered simulaneously
+
 ## 1.3.0
 
 - sharing state when call Provider in different palces in different projects

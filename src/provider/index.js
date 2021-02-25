@@ -15,8 +15,7 @@ function generateContext(_key, _uid) {
 }
 
 function Provider({ uniqueKey, models, children, ...rest }) {
-  const [Context, setContext] = React.useState(null);
-  const [_c_store, setStore] = React.useState(null);
+  const [combinedWithStore, setCombinedWithStore] = React.useState({ com: null, store: null })
   const uid_cache = React.useRef([]);
   React.useEffect(() => {
     const _new_uid = (Math.random() * Math.random()).toString().replace(/\./g, '');
@@ -24,8 +23,7 @@ function Provider({ uniqueKey, models, children, ...rest }) {
     const _com_key = `${_key}_${_new_uid}`;
     uid_cache.current.push(_com_key);
     const [_store, _Context] = generateContext(_key, _new_uid);
-    setContext(_Context);
-    setStore(_store);
+    setCombinedWithStore({ com: _Context.Provider, store: _store });
     createStore(reducer, { ...rest }, _store);
     if (Array.isArray(models)) {
       models.forEach(_it => {
@@ -38,10 +36,10 @@ function Provider({ uniqueKey, models, children, ...rest }) {
       })
     }
   }, [uniqueKey])
-  console.log(`Provider for ${uniqueKey} is rendering`);
-  return Context && <Context.Provider value={_c_store}>
+  console.log(`Provider for ${uniqueKey || 'default'} is rendering`);
+  return combinedWithStore.com && <combinedWithStore.com value={combinedWithStore.store}>
     {children}
-  </Context.Provider>
+  </combinedWithStore.com>
 }
 
 export default Provider;

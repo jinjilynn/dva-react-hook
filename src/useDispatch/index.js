@@ -21,7 +21,6 @@ export default function useDispatch(action) {
    if (action.type.indexOf('/') === -1) {
       throw new Error('you must do some effects in your type');
    }
-   const dispatch = useDispatcher();
 
    let { type, ...others } = action;
    type = type.split('/');
@@ -49,14 +48,14 @@ export default function useDispatch(action) {
    const effectwrapped = async (...rest) => {
       return effect(...rest, {
          ...others, state: Object.create({ get value() { return clone(store.runtime_state[type[0]], true) } }), setState: (data, { cancelUpdate, callbacks } = {}) => {
-            dispatch({ type: 'set', name: type[0], data, cancelUpdate });
+            store.dispatch({ type: 'set', name: type[0], data, cancelUpdate });
             if (callbacks) {
                const value = clone(store.runtime_state[type[0]], true);
                execBack(modelbacks, callbacks, value);
             }
          },
          select: (name) => {
-            return get(name, dispatch, store);
+            return get(name, store);
          }
       });
    }

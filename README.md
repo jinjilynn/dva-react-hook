@@ -1,5 +1,5 @@
 # dva-react-hook
-[![NPM](https://img.shields.io/badge/npm-v1.3.3-blue)](https://www.npmjs.com/package/dva-react-hook)
+[![NPM](https://img.shields.io/badge/npm-v1.3.4-blue)](https://www.npmjs.com/package/dva-react-hook)
 [![size](https://img.shields.io/badge/size-82KB-green)]()
 > React Hooks based, concise、lightweight framework.
 
@@ -84,6 +84,8 @@ However, you can use Provider multiple times in your project nested in a Provide
 If the separated Providers whose props named uniqueKey are the same share the same state, otherwise, their states are isolate from each other. uniqueKey's type is String and defaulted by 'default'.
 
 uniqueKey is useful for Module Federation of webpack 5.
+
+NOTE: To find the nearest Provider, I use a stack to store the Context. when iterating the stack as long as finds the nearest Provider, will the loop progress break. So 'Warning: React has detected a change in the order of Hooks' may occur, please ignore it, its ok.
 
 You can pass props(not named by models) to Provider, the props will be initialized into 'state'. If you want to register models synchronously,you can use props named models. 
 

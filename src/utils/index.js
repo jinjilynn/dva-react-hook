@@ -1,6 +1,6 @@
 import clone from 'clone';
 
-export function get(name, dispatch, store) {
+export function get(name, store) {
   if(!store){
     throw new Error('strange!! there is no store in utils, please issue it.');
   }
@@ -11,7 +11,7 @@ export function get(name, dispatch, store) {
     return [
       Object.create({ get value() { return clone(store.runtime_state[name], true) } }),
       (value, { cancelUpdate, callbacks } = {}) => {
-        dispatch({ type: 'coverSet', name, data: value, inner: store.inner, cancelUpdate });
+        store.dispatch({ type: 'coverSet', name, data: value, inner: store.inner, cancelUpdate });
         if (callbacks && store.MODELS[name]) {
           const model = store.MODELS[name];
           const modelbacks = model.callbacks;
@@ -29,7 +29,7 @@ export function get(name, dispatch, store) {
       }
     }),
     (value, { cancelUpdate, callbacks } = {}) => {
-      dispatch({ type: 'updateSet', name, data: value, inner: store.inner, cancelUpdate });
+      store.dispatch({ type: 'updateSet', name, data: value, inner: store.inner, cancelUpdate });
       if (callbacks && store.MODELS[names[0]]) {
         const model = store.MODELS[names[0]];
         const modelbacks = model.callbacks;

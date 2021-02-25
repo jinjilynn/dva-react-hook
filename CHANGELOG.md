@@ -1,4 +1,8 @@
 # Changelog for dva-react-hook
+
+## 1.3.3
+
+-   add uniqueKey in Provider
 ## 1.3.2
 
 - add queue caching dispatch when multiple dispatchs are triggered simulaneously

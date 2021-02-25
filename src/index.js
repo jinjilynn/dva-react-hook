@@ -1,6 +1,5 @@
 import Provider from './provider';
-import store from './store';
-export { Provider, store };
+export { Provider };
 export { default as connect } from './connect';
 export { default as Dynamic } from './dynamic';
 export { default as useAdd } from './useAdd';

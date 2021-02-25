@@ -1,7 +1,9 @@
-import store from '../store';
 import clone from 'clone';
 
-export function get(name, dispatch) {
+export function get(name, dispatch, store) {
+  if(!store){
+    throw new Error('strange!! there is no store in utils, please issue it.');
+  }
   if (typeof name !== 'string') {
     throw new Error('name must be a string')
   }
@@ -23,7 +25,7 @@ export function get(name, dispatch) {
   return [
     Object.create({
       get value() {
-        return getPartValue(names);
+        return getPartValue(names, store);
       }
     }),
     (value, { cancelUpdate, callbacks } = {}) => {
@@ -31,7 +33,7 @@ export function get(name, dispatch) {
       if (callbacks && store.MODELS[names[0]]) {
         const model = store.MODELS[names[0]];
         const modelbacks = model.callbacks;
-        const value = getPartValue(names);
+        const value = getPartValue(names, store);
         execBack(modelbacks, callbacks, value);
       }
     }
@@ -53,7 +55,7 @@ export function execBack(modelbacks, callbacks, value) {
   }
 }
 
-function getPartValue(names) {
+function getPartValue(names, store) {
   let i = 0;
   let r;
   while (i < names.length) {

@@ -1,10 +1,14 @@
 
 import useDispatcher from '../useDispatcher';
-import store from '../store';
+import { useNearestStore } from '../store';
 import { get, execBack } from '../utils';
 import clone from 'clone';
 
 export default function useDispatch(action) {
+   const store = useNearestStore();
+   if (!store) {
+      throw new Error('strange!! there is no store in useDispatch, please issue it.');
+   }
    if (Object.prototype.toString.call(action) !== '[object Object]') {
       throw new Error('action in useDispatch must be an Object');
    }
@@ -52,7 +56,7 @@ export default function useDispatch(action) {
             }
          },
          select: (name) => {
-            return get(name, dispatch);
+            return get(name, dispatch, store);
          }
       });
    }

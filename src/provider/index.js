@@ -1,28 +1,47 @@
 import React from 'react';
-import store from '../store';
+import store, { setStoreByKey, getStoreByKey } from '../store';
 import reducer from '../reducer';
 import createStore from '../utils/redux';
 import { registeReducers } from '../dynamic';
-function initState($i) {
-  if ($i && typeof $i == 'object' && !Array.isArray($i)) {
-    const keys = Object.keys($i);
-    if (keys.length > 0) {
-      store.runtime_state = Object.assign($i, store.runtime_state);
-    }
+
+function generateContext(_key, _uid) {
+  const Context = React.createContext();
+  let _store = getStoreByKey(_key);
+  if (!_store) {
+    _store = setStoreByKey(_key);
   }
+  store[`${_key}_${_uid}`] = Context;
+  return [_store, Context]
 }
-function Provider({ models, children, ...rest }) {
-  const [state, dispatch] = createStore(reducer, { ...rest }, initState);
-  if (Array.isArray(models)) {
-    models.forEach(_it => {
-      registeReducers(_it, dispatch);
-    });
-  };
-  return (
-    <>
-      {children}
-    </>
-  )
+
+function Provider({ uniqueKey, models, children, ...rest }) {
+  const [Context, setContext] = React.useState(null);
+  const [_c_store, setStore] = React.useState(null);
+  const uid_cache = React.useRef([]);
+  React.useEffect(() => {
+    const _new_uid = (Math.random() * Math.random()).toString().replace(/\./g, '');
+    const _key = (uniqueKey && uniqueKey.toString()) || 'default';
+    const _com_key = `${_key}_${_new_uid}`;
+    uid_cache.current.push(_com_key);
+    const [_store, _Context] = generateContext(_key, _new_uid);
+    setContext(_Context);
+    setStore(_store);
+    createStore(reducer, { ...rest }, _store);
+    if (Array.isArray(models)) {
+      models.forEach(_it => {
+        registeReducers(_it, _store);
+      });
+    };
+    return () => {
+      uid_cache.current.forEach(item => {
+        delete store[item];
+      })
+    }
+  }, [uniqueKey])
+  console.log(`Provider for ${uniqueKey} is rendering`);
+  return Context && <Context.Provider value={_c_store}>
+    {children}
+  </Context.Provider>
 }
 
 export default Provider;

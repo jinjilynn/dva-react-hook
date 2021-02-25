@@ -1,6 +1,9 @@
-import store from '../store';
 
 export default function reducer(state, action) {
+  const store = this;
+  if(!store){
+    throw new Error('strange!! there is no store in reducer, please issue it.');
+  }
   !store.runtime_state && (store.runtime_state = state);
   if (action.inner === store.inner) {
     switch (action.type) {

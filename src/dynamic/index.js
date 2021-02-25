@@ -1,8 +1,8 @@
 import React from 'react';
 import useDispatcher from '../useDispatcher';
-import store from '../store';
+import { useNearestStore } from '../store';
 
-export function registeReducers(_, dispatch){
+export function registeReducers(_, store){
     if(Object.prototype.toString.call(_) !== '[object Object]'){
       throw new Error('your model must be an object');
     }
@@ -18,6 +18,10 @@ export function registeReducers(_, dispatch){
     // if(store.runtime_state.hasOwnProperty(_.name)){
     //   console.warn(`registed failed, ${_.name} model has been registed,please change another name`)
     // }
+    
+    if(!store){
+      throw new Error('strange!! there is no store in dynamic, please issue it.');
+    }
     if (!store.MODELS[_.name] && !store.runtime_state.hasOwnProperty(_.name)) {
         store.MODELS[_.name] = _;
         let data = {};
@@ -27,7 +31,7 @@ export function registeReducers(_, dispatch){
         if(typeof _.init === 'function'){
           data = _.init();
         }
-        dispatch({
+        store.dispatch({
           type:'add',
           name:_.name,
           initdate:data,
@@ -37,8 +41,11 @@ export function registeReducers(_, dispatch){
   }
 
 function Dynamic(props){
+    const store = useNearestStore();
+    if(!store){
+      throw new Error('strange!! there is no store in dynamic, please issue it.');
+    }
     const [state,setMount] = React.useState({mounted: false,component: null});
-    const dispatch = useDispatcher();
     const {models,renderBefore,render,component,...rest} = props;
     React.useEffect(() => {
       typeof renderBefore === 'function' && renderBefore();
@@ -60,7 +67,7 @@ function Dynamic(props){
               if (!Array.isArray(m)) {
                   m = [m];
               }
-              m.map(_ => registeReducers(_,dispatch));
+              m.map(_ => registeReducers(_, store));
           });
           const Component = ret[len].default || ret[len];
           setMount({mounted:true,component:Component});

@@ -1,6 +1,5 @@
-import store from '../store';
 
-async function loop_dispatch() {
+async function loop_dispatch(store) {
     while (true) {
         if (!store.isDispatching.dispatching) {
             store.isDispatching.dispatching = true;
@@ -20,6 +19,10 @@ async function loop_dispatch() {
 }
 
 function dispatch(action) {
+    const store = this;
+    if(!store){
+        throw new Error('strange!! there is no store in dispatch of utils, please issue it.');
+    }
     if (!action) {
         throw new Error(
             'Actions must be plain objects. '
@@ -47,17 +50,24 @@ function dispatch(action) {
     }
 }
 
-export default function createStore(reducer, preloadedState, initfun) {
+function initfun($i, store) {
+    if ($i && typeof $i == 'object' && !Array.isArray($i)) {
+        const keys = Object.keys($i);
+        if (keys.length > 0) {
+            store.runtime_state = Object.assign($i, store.runtime_state);
+        }
+    }
+}
+
+export default function createStore(reducer, preloadedState, store) {
     if (typeof reducer !== 'function') {
         throw new Error('Expected the reducer to be a function.')
     }
-    if (typeof initfun === 'function') {
-        if (typeof preloadedState !== 'undefined') {
-            initfun(preloadedState);
-        }
+    if (typeof preloadedState !== 'undefined') {
+        initfun(preloadedState, store);
     }
-    !store.REDUCER && (store.REDUCER = reducer);
-    !store.dispatch && (store.dispatch = dispatch);
-    loop_dispatch();
+    !store.REDUCER && (store.REDUCER = reducer.bind(store));
+    !store.dispatch && (store.dispatch = dispatch.bind(store));
+    loop_dispatch(store);
     return [store.runtime_state, store.dispatch];
 }

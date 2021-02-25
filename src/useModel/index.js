@@ -1,13 +1,13 @@
 import React from 'react';
 import useDispatcher from '../useDispatcher';
 import { get } from '../utils';
-import store from '../store';
-
-function removeConnect(uid){
-    delete store.REFRESH_CACHE[uid];
-}
+import {useNearestStore} from '../store';
 
 export default function useModel(name, update){
+    const store = useNearestStore();
+    if(!store){
+      throw new Error('strange!! there is no store in useModel, please issue it.');
+    }
     if(typeof name !== 'string'){
       throw new Error('useModel\'s argument must be a string')
     }
@@ -16,9 +16,9 @@ export default function useModel(name, update){
       const uid = `$$track_uid${Math.random().toString().replace(/./,'')}`
       !update && (store.REFRESH_CACHE[uid] = {_s:name,set:setState});
       return () => {
-        !update && removeConnect(uid);
+        !update && (delete store.REFRESH_CACHE[uid]);
       }
     },[])
     const dispatch = useDispatcher()
-    return get(name,dispatch);
+    return get(name,dispatch, store);
 }

@@ -1,6 +1,6 @@
 # dva-react-hook
-[![NPM](https://img.shields.io/badge/npm-v1.3.2-blue)](https://www.npmjs.com/package/dva-react-hook)
-[![size](https://img.shields.io/badge/size-80KB-green)]()
+[![NPM](https://img.shields.io/badge/npm-v1.3.3-blue)](https://www.npmjs.com/package/dva-react-hook)
+[![size](https://img.shields.io/badge/size-82KB-green)]()
 > React Hooks based, concise、lightweight framework.
 
 ## Table of Contents
@@ -79,6 +79,12 @@ NOTE: React hooks require `react` and `react-dom` version `16.8.0` or higher.
 
 The Provider component provides 'state' and 'dispatch' for subcomponents, so it's best to put the Provider component at the top level.
 
+However, you can use Provider multiple times in your project nested in a Provider or not nested. the component nested inside of Providers will get the state from the nearest Provider. 
+
+If the separated Providers whose props named uniqueKey are the same share the same state, otherwise, their states are isolate from each other. uniqueKey's type is String and defaulted by 'default'.
+
+uniqueKey is useful for Module Federation of webpack 5.
+
 You can pass props(not named by models) to Provider, the props will be initialized into 'state'. If you want to register models synchronously,you can use props named models. 
 
 ##### ps: the props named models must be an array
@@ -125,7 +131,7 @@ You can pass props(not named by models) to Provider, the props will be initializ
   }
   const initState = { count: 0 }
   ReactDOM.render(
-    <Provider {...initState}  models={[loginModel]}>
+    <Provider uniqueKey="namespace" {...initState}  models={[loginModel]}>
       <App />
     </Provider>,
     document.getElementById('root'),

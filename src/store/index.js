@@ -1,8 +1,9 @@
 import React from 'react';
+import { get, execBack } from '../utils';
 
 const store = {};
 
-function generateStore(key){
+function generateStore(key) {
    if (!window[key]) {
       const inner = Symbol();
       const MODELS = {};
@@ -12,7 +13,7 @@ function generateStore(key){
          name: null
       };
       const dispatch_queue = {
-         
+
       };
       let runtime_state = undefined;
       let REDUCER;
@@ -25,31 +26,33 @@ function generateStore(key){
          REDUCER,
          isDispatching,
          runtime_state,
-         dispatch_queue
+         dispatch_queue,
+         get,
+         execBack
       };
    };
    return window[key];
 }
 
-export function setStoreByKey(key){
+export function setStoreByKey(key) {
    return generateStore(`dva_react_hook_store_${key.toString()}`);
 }
 
-export function getStoreByKey(key){
+export function getStoreByKey(key) {
    return window[`dva_react_hook_store_${key.toString()}`];
 }
 
-export function useNearestStore(){
+export function useNearestStore() {
    let _nearst_state;
    const _store_values = Object.values(store).reverse();
-    for(let i = 0; i < _store_values.length; i += 1){
-        const _item = React.useContext(_store_values[i]);
-        if(_item){
+   for (let i = 0; i < _store_values.length; i += 1) {
+      const _item = React.useContext(_store_values[i]);
+      if (_item) {
          _nearst_state = _item;
-          break;
-        }
-    }
-    return _nearst_state;
+         break;
+      }
+   }
+   return _nearst_state;
 }
 
 export default store;

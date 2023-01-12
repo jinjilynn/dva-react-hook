@@ -85,7 +85,7 @@ If the separated Providers whose props named uniqueKey are the same share the sa
 
 uniqueKey is useful for Module Federation of webpack 5.
 
-NOTE: To find the nearest Provider, I use a stack to store the Context. when iterating the stack as long as finds the nearest Provider, will the loop progress break. So 'Warning: React has detected a change in the order of Hooks' may occur, please ignore it, its ok.
+NOTE: To find the nearest Provider, I use a stack to store the Context. when iterating the stack as long as finds the nearest Provider, will break the loop progress. So 'Warning: React has detected a change in the order of Hooks' may occur, please ignore it, its ok.
 
 You can pass props(not named by models) to Provider, the props will be initialized into 'state'. If you want to register models synchronously,you can use props named models. 
 

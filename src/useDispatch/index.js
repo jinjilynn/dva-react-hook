@@ -1,5 +1,4 @@
 
-import useDispatcher from '../useDispatcher';
 import { useNearestStore } from '../store';
 import { get, execBack } from '../utils';
 import clone from 'clone';
@@ -47,7 +46,7 @@ export default function useDispatch(action) {
 
    const effectwrapped = async (...rest) => {
       return effect(...rest, {
-         ...others, state: Object.create({ get value() { return clone(store.runtime_state[type[0]], true) } }), setState: (data, { cancelUpdate, callbacks } = {}) => {
+         ...others, state: clone(store.runtime_state[type[0]], true), setState: (data, { cancelUpdate, callbacks } = {}) => {
             store.dispatch({ type: 'set', name: type[0], data, cancelUpdate });
             if (callbacks) {
                const value = clone(store.runtime_state[type[0]], true);

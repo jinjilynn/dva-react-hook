@@ -1,7 +1,7 @@
 import clone from 'clone';
 
 export function get(name, store) {
-  if(!store){
+  if (!store) {
     throw new Error('strange!! there is no store in utils, please issue it.');
   }
   if (typeof name !== 'string') {
@@ -9,7 +9,7 @@ export function get(name, store) {
   }
   if (name.indexOf('/') === -1) {
     return [
-      Object.create({ get value() { return clone(store.runtime_state[name], true) } }),
+      clone(store.runtime_state[name], true),
       (value, { cancelUpdate, callbacks } = {}) => {
         store.dispatch({ type: 'coverSet', name, data: value, inner: store.inner, cancelUpdate });
         if (callbacks && store.MODELS[name]) {
@@ -23,11 +23,7 @@ export function get(name, store) {
   }
   const names = name.split('/');
   return [
-    Object.create({
-      get value() {
-        return getPartValue(names, store);
-      }
-    }),
+    getPartValue(names, store),
     (value, { cancelUpdate, callbacks } = {}) => {
       store.dispatch({ type: 'updateSet', name, data: value, inner: store.inner, cancelUpdate });
       if (callbacks && store.MODELS[names[0]]) {

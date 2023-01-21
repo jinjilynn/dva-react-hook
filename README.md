@@ -1,6 +1,8 @@
 # dva-react-hook
+
 [![NPM](https://img.shields.io/badge/npm-v1.3.6-blue)](https://www.npmjs.com/package/dva-react-hook)
-[![size](https://img.shields.io/badge/size-82KB-green)]()
+[![size](https://img.shields.io/badge/size-58KB-green)]()
+
 > React Hooks based, concise、lightweight framework.
 
 ## Table of Contents
@@ -29,8 +31,9 @@ npm install --save dva-react-hook
 ```
 
 ## In Node.js
+
 ```javascript
-var dvaHook = require('dva-react-hook');
+var dvaHook = require("dva-react-hook");
 ```
 
 ## Quick Start
@@ -39,35 +42,40 @@ var dvaHook = require('dva-react-hook');
 //
 // Bootstrap your app
 //
-import React from 'react';
-import Provider, { useModel } from 'dva-react-hook';
+import React from "react";
+import Provider, { useModel } from "dva-react-hook";
 
-function App(){
-    const name = useModel('name')[0];
-    const [ { value: count }, setCount ] = useModel('apples/count');
+function App() {
+  const name = useModel("name")[0];
+  const [count, setCount] = useModel("apples/count");
 
-    const eat = () => {
-        setCount(count - 1);
-    }
-    return <div>
-        <span> { name.value } has { count } apples</span>
-        <button onClick={eat}>Eat One</button>
-    </div>    
+  const eat = () => {
+    setCount(count - 1);
+  };
+  return (
+    <div>
+      <span>
+        {" "}
+        {name} has {count} apples
+      </span>
+      <button onClick={eat}>Eat One</button>
+    </div>
+  );
 }
 
 const initState = {
-  name:'Lynn',
-  apples:{
-      state:'raw',
-      count:4
-  }
-}
+  name: "Lynn",
+  apples: {
+    state: "raw",
+    count: 4,
+  },
+};
 
 ReactDOM.render(
   <Provider {...initState}>
     <App />
   </Provider>,
-  document.getElementById('root'),
+  document.getElementById("root")
 );
 ```
 
@@ -79,77 +87,78 @@ NOTE: React hooks require `react` and `react-dom` version `16.8.0` or higher.
 
 The Provider component provides 'state' and 'dispatch' for subcomponents, so it's best to put the Provider component at the top level.
 
-However, you can use Provider multiple times in your project nested in a Provider or not nested. the component nested inside of Providers will get the state from the nearest Provider. 
+However, you can use Provider multiple times in your project nested in a Provider or not nested. the component inside nested Providers will get the state from the nearest Provider.
 
-If the separated Providers whose props named uniqueKey are the same share the same state, otherwise, their states are isolate from each other. uniqueKey's type is String and defaulted by 'default'.
+If the separated Providers whose prop 'uniqueKey' are the same share the same state, otherwise, their states are isolate from each other. uniqueKey's type is String and defaulted by 'default'.
 
-uniqueKey is useful for Module Federation of webpack 5.
+NOTE: To find the nearest Provider, I use a stack to store the Context. when iterating the stack, as long as finding the nearest Provider, it will break the loop progress. So 'Warning: React has detected a change in the order of Hooks' may occur, please ignore it, its ok.
 
-NOTE: To find the nearest Provider, I use a stack to store the Context. when iterating the stack as long as finds the nearest Provider, will break the loop progress. So 'Warning: React has detected a change in the order of Hooks' may occur, please ignore it, its ok.
-
-You can pass props(not named by models) to Provider, the props will be initialized into 'state'. If you want to register models synchronously,you can use props named models. 
+You can pass props(not named by models) to Provider, the props will be initialized into 'state'. If you want to register models , you can use props named models.
 
 ##### ps: the props named models must be an array
 
 ```tsx
-  import React from 'react';
-  import Provider, { useDispatch, useModel } from 'dva-react-hook';
+import React from "react";
+import Provider, { useDispatch, useModel } from "dva-react-hook";
 
-  function App(){
-    const loginState = useModel('login_model')[0].value;
-    const login = useDispatch({ type: 'login_model/login'})
-    return <div>
-        {
-          loginState ? <div>
-            <span>{loginState.name} has logged in</span>
-            <span>sex:{loginState.sex}</span>
-            <span>age:{loginState.age}</span>
-          </div> :
-          <div>
-            <span>nobody log in</span>
-            <button onClick={login}>登录</button>
-          </div>
-        }
-    </div>    
-  }
-
-  const loginModel = {
-    name: 'login_model',
-    init: {
-      name: null,
-      sex: null,
-      age: null
-    },
-    effects: {
-      login: async(e, { setState }) => {
-        const _r = await loginService();
-        setState({
-          name: 'lynn',
-          sex: 'male',
-          age: 22
-        })
-      }
-    }
-  }
-  const initState = { count: 0 }
-  ReactDOM.render(
-    <Provider uniqueKey="namespace" {...initState}  models={[loginModel]}>
-      <App />
-    </Provider>,
-    document.getElementById('root'),
+function App() {
+  const loginState = useModel("login_model")[0];
+  const login = useDispatch({ type: "login_model/login" });
+  return (
+    <div>
+      {loginState ? (
+        <div>
+          <span>{loginState.name} has logged in</span>
+          <span>sex:{loginState.sex}</span>
+          <span>age:{loginState.age}</span>
+        </div>
+      ) : (
+        <div>
+          <span>nobody log in</span>
+          <button onClick={login}>登录</button>
+        </div>
+      )}
+    </div>
   );
+}
+
+const loginModel = {
+  name: "login_model",
+  init: {
+    name: null,
+    sex: null,
+    age: null,
+  },
+  effects: {
+    login: async (e, { setState }) => {
+      const _r = await loginService();
+      setState({
+        name: "lynn",
+        sex: "male",
+        age: 22,
+      });
+    },
+  },
+};
+const initState = { count: 0 };
+ReactDOM.render(
+  <Provider uniqueKey="namespace" {...initState} models={[loginModel]}>
+    <App />
+  </Provider>,
+  document.getElementById("root")
+);
 ```
 
 ### `Dynamic`
 
 You can use Dynamic to load components and models asynchronously.
 
-Props|Type|Description
-:--:|:--:|:--:
-renderBefore  | Function  | you can something before render
-component | React.ReactNode  |  A React component to render
-render  | Function  |  This allows for convenient inline rendering and wrapping,in addition to the ability to load component with ’import‘ asynchronously
-models  | Function \| Array  |  Function should return an array.You can load model asynchronously with ’import‘ or synchronously with array
+|    Props     |       Type        |                                                            Description                                                             |
+| :----------: | :---------------: | :--------------------------------------------------------------------------------------------------------------------------------: |
+| renderBefore |     Function      |                                                  you can something before render                                                   |
+|  component   |  React.ReactNode  |                                                    A React component to render                                                     |
+|    render    |     Function      | This allows for convenient inline rendering and wrapping,in addition to the ability to load component with ’import‘ asynchronously |
+|    models    | Function \| Array |            Function should return an array.You can load model asynchronously with ’import‘ or synchronously with array             |
 
 ```tsx
 import { Dynamic } from 'dva-react-hook';
@@ -161,7 +170,9 @@ import { Dynamic } from 'dva-react-hook';
 <Dynamic models={() => [import('url1'),import('url2'),...]} />
 <Dynamic models={[model-object,model-object,...] />
 ```
+
 ### `Model`
+
 ```javascript
 {
     name:'some-name',
@@ -189,19 +200,20 @@ import { Dynamic } from 'dva-react-hook';
 ```
 
 ### `useModel`
+
 You can use useModel hook to inject a model state into a component.
 
 The parameter required by useModel Hook is a string path.
-It returns a pair of values: an object and a function that updates the model state.
+It returns a pair of values: a state and a function that updates it.
 
-1. The object returned has a getter named value, value returns the current model state defined by the path.
-You can take the value when you define it, or take the value until you use it. The difference is that when you take the second action, you will get the updated value synchronously before the component re-renders. It is not recommended to do this unless it is absolutely necessary.
-2. The function returned updates the model state, not partly. You can also pass the second argument(optional) of type Object
+1. the state stands for the current model state defined by the path.
 
-Property|Description|Type
-:--:|:--:|:--:
-cancelUpdate  | If the value is true, the corresponding component's update will not be triggered, otherwise the update will be triggered.| boolean
-callbacks | After the function updates the model state is executed, The specified callbacks defined in the model will also be executed immediately  |  string \| Array
+2. The function returned updates the model state, not partly. You can also pass a second argument(optional) of type Object
+
+|   Property   |                                                              Description                                                               |      Type       |
+| :----------: | :------------------------------------------------------------------------------------------------------------------------------------: | :-------------: |
+| cancelUpdate |       If the value is true, the corresponding component's update will not be triggered, otherwise the update will be triggered.        |     boolean     |
+|  callbacks   | After the function updates the model state is executed, The specified callbacks defined in the model will also be executed immediately | string \| Array |
 
 ```javascript
 import React from 'react';
@@ -209,14 +221,14 @@ import Provider, { useDispatch, useModel } from 'dva-react-hook';
 
 function App(){
   const eat = useDispatch({ type: 'apple/eat' });
-  const apple = useModel('apple')[0].value;
+  const apple = useModel('apple')[0];
   function eatOne(){
     eat(1);
   }
   return <div>
       <span>there are {apple.count} apples</span>
       <button onClick={eatOne}>eat one apple</button>
-  </div>    
+  </div>
 }
 
 const apple_model = {
@@ -225,8 +237,8 @@ const apple_model = {
     count:8
   },
   effects: {
-    eat: (num, {state:{ value }, setState }) => {
-      setState({count: value.count - num}, { cancelUpdate: true, callbacks: 'show-left-count' });
+    eat: (num, {state, setState }) => {
+      setState({count: satae.count - num}, { cancelUpdate: true, callbacks: 'show-left-count' });
     }
   },
   callbacks: {
@@ -243,34 +255,34 @@ ReactDOM.render(
 );
 ```
 
-
 ### `useDispatch`
 
 useDispatch returns the function you registered in effects,the only argument to the useDispatch Hook is an object, the object must have an property named type, also you can set some other properties.
 The function returned by useDispatch is wrapped by an async function and also is injected with an object parameter,so that you can get the state of the model、the function updates it and a selector which can select other models' state and set other models' state.
+
 ```javascript
-
-
-const loginaction = useDispatch({ type:'login/login', otherproperties:''});
+const loginaction = useDispatch({ type: "login/login", otherproperties: "" });
 //otherproperty is optional, if you set some other properties, you can get them in the injected argument
 
 //so your code in model maybe like this   async login({ name,pass },{ state, setState, select, otherproperties }){}
 
-loginaction({name,pass}).then(data => {
-  // do something
-}).catch(error => {
-  // do something
-}).finally(() => {
-  // do something
-})
-
+loginaction({ name, pass })
+  .then((data) => {
+    // do something
+  })
+  .catch((error) => {
+    // do something
+  })
+  .finally(() => {
+    // do something
+  });
 ```
 
 ### `connect`
 
 If you are obsessed with writing classes and have no other state management tools, I provide the connect decorator.
 The connect decorator receives two arguments: the first is required and the second is optional.
-The first argument is as same as  useModel's.
+The first argument is as same as useModel's.
 The second argument is an object that has 'name' and 'action' properties
 In your class component,you will have three new props: xxxState,setXXX and the value of the name property
 
@@ -296,9 +308,9 @@ If you want to dynamically inject model state, you can use it.
 useAdd has three arguments: name initdata, once
 
 ```javascript
-import { useAdd } from 'dva-react-hook';
+import { useAdd } from "dva-react-hook";
 
-useAdd(name, initdate, once)
+useAdd(name, initdate, once);
 // name is the model's name
 // initdata can be an object or function
 // once decided whether to execute only once just like componentDidMount

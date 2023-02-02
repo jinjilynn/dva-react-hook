@@ -2,7 +2,7 @@
 
 # dependencies
 /node_modules
-/webpack
+/webpack/node_modules
 
 
 # misc

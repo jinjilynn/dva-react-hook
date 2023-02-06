@@ -47,7 +47,7 @@ function Provider({
         });
       }
     };
-    if (offlineConfig.recoverFromOffline === true) {
+    if (offlineConfig.autoRecover === true) {
       _store.offlineInstance
         .iterate((value, key) => {
           _store.runtime_state[key] = value;

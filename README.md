@@ -1,6 +1,6 @@
 # dva-react-hook
 
-[![NPM](https://img.shields.io/badge/npm-v2.0.6-blue)](https://www.npmjs.com/package/dva-react-hook)
+[![NPM](https://img.shields.io/badge/npm-v2.0.7-blue)](https://www.npmjs.com/package/dva-react-hook)
 [![size](https://img.shields.io/badge/size-104KB-green)]()
 
 > React Hooks based, concise、lightweight framework, supporting offline storage, like blob,bufferArray and all primitive types.
@@ -142,7 +142,7 @@ const loginModel = {
 };
 const initState = { count: 0 };
 ReactDOM.render(
-  <Provider noCached={ true } offlineConfig={ offline: true, recoverFromOffline: true } uniqueKey="namespace" {...initState} models={[loginModel]}>
+  <Provider noCached={ true } offlineConfig={ offline: true, autoRecover: true } uniqueKey="namespace" {...initState} models={[loginModel]}>
     <App />
   </Provider>,
   document.getElementById("root")

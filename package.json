@@ -1,6 +1,6 @@
 {
   "name": "dva-react-hook",
-  "version": "2.0.6",
+  "version": "2.0.7",
   "description": "React Hooks based, concise、lightweight framework",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -12,7 +12,9 @@
     "reducer",
     "state",
     "dva",
-    "saga"
+    "saga",
+    "offline",
+    "storage"
   ],
   "author": {
     "name": "jilin.jin",

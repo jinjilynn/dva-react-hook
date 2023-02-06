@@ -1,7 +1,7 @@
 import React from "react";
 import { useNearestStore } from "../store";
 
-export function registeReducers(_, store) {
+export function registeModel(_, store) {
   if (Object.prototype.toString.call(_) !== "[object Object]") {
     throw new Error("your model must be an object");
   }
@@ -14,15 +14,13 @@ export function registeReducers(_, store) {
   if (_.name.length === 0) {
     throw new Error("name can not be empty");
   }
-  // if(store.runtime_state.hasOwnProperty(_.name)){
-  //   console.warn(`registed failed, ${_.name} model has been registed,please change another name`)
-  // }
-
   if (!store) {
-    throw new Error("strange!! there is no store in dynamic, please issue it.");
+    throw new Error("strange!! there is no store, please issue it.");
   }
-  if (!store.MODELS[_.name] && !store.runtime_state.hasOwnProperty(_.name)) {
+  if (!store.MODELS[_.name]) {
     store.MODELS[_.name] = _;
+  }
+  if (!store.runtime_state.hasOwnProperty(_.name)) {
     let data = {};
     if (_.hasOwnProperty("init")) {
       data = _.init;
@@ -71,7 +69,7 @@ function Dynamic(props) {
         if (!Array.isArray(m)) {
           m = [m];
         }
-        m.map((_) => registeReducers(_, store));
+        m.map((_) => registeModel(_, store));
       });
       const Component = ret[len].default || ret[len];
       setMount({ mounted: true, component: Component });

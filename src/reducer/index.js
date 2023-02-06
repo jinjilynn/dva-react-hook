@@ -1,23 +1,20 @@
 import { nanoid } from "nanoid";
-export default function reducer(state, action) {
+export default function reducer(action) {
   const store = this;
   if (!store) {
     throw new Error("strange!! there is no store in reducer, please issue it.");
   }
-  !store.runtime_state && (store.runtime_state = state);
   if (action.inner === store.inner) {
     switch (action.type) {
       case "add":
-        store.runtime_state = {
-          ...store.runtime_state,
-          [action.name]: action.initdate,
-        };
-        return store.runtime_state;
+        store.runtime_state[action.name] = action.initdate;
+        store.offline &&
+          store.offlineInstance.setItem(action.name, action.initdate);
+        return;
       case "coverSet":
-        store.runtime_state = {
-          ...store.runtime_state,
-          [action.name]: action.data,
-        };
+        store.runtime_state[action.name] = action.data;
+        store.offline &&
+          store.offlineInstance.setItem(action.name, action.data);
         if (!action.cancelUpdate) {
           const track1 = Object.values(store.REFRESH_CACHE);
           track1.forEach((it) => {
@@ -26,9 +23,10 @@ export default function reducer(state, action) {
             }
           });
         }
-        return state;
+        return;
       case "updateSet":
         const names = action.name.split("/");
+        const keyName = action.name.split("/")[0];
         const length = names.length;
         let temp = store.runtime_state;
         let i = 0;
@@ -39,13 +37,15 @@ export default function reducer(state, action) {
           temp = temp[names[i]];
           i += 1;
         }
+        store.offline &&
+          store.offlineInstance.setItem(keyName, store.runtime_state[keyName]);
         if (!action.cancelUpdate) {
           const track2 = Object.values(store.REFRESH_CACHE);
           track2.forEach((it) => {
             it && action.name === it._s && it.set(nanoid());
           });
         }
-        return state;
+        return;
       default: {
         throw new Error(`Unhandled action type: ${action.type}`);
       }
@@ -63,17 +63,15 @@ export default function reducer(state, action) {
       typeof action.data === "function" ? action.data() : action.data;
     switch (action.type) {
       case "set":
-        store.runtime_state = {
-          ...store.runtime_state,
-          [action.name]: data,
-        };
+        store.runtime_state[action.name] = data;
+        store.offline && store.offlineInstance.setItem(action.name, data);
         if (!action.cancelUpdate) {
           const track3 = Object.values(store.REFRESH_CACHE);
           track3.forEach((it) => {
             it && it._s.split("/")[0] === action.name && it.set(nanoid());
           });
         }
-        return state;
+        return;
       default: {
         throw new Error(`Unhandled action type: ${action.type}`);
       }

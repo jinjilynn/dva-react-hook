@@ -1,9 +1,9 @@
 # dva-react-hook
 
-[![NPM](https://img.shields.io/badge/npm-v2.0.5-blue)](https://www.npmjs.com/package/dva-react-hook)
-[![size](https://img.shields.io/badge/size-58KB-green)]()
+[![NPM](https://img.shields.io/badge/npm-v2.0.6-blue)](https://www.npmjs.com/package/dva-react-hook)
+[![size](https://img.shields.io/badge/size-104KB-green)]()
 
-> React Hooks based, concise、lightweight framework.
+> React Hooks based, concise、lightweight framework, supporting offline storage, like blob,bufferArray and all primitive types.
 
 ## Table of Contents
 
@@ -130,7 +130,7 @@ const loginModel = {
     age: null,
   },
   effects: {
-    login: async (e, { setState }) => {
+    login: async ( { setState }) => {
       const _r = await loginService();
       setState({
         name: "lynn",
@@ -142,7 +142,7 @@ const loginModel = {
 };
 const initState = { count: 0 };
 ReactDOM.render(
-  <Provider uniqueKey="namespace" {...initState} models={[loginModel]}>
+  <Provider noCached={ true } offlineConfig={ offline: true, recoverFromOffline: true } uniqueKey="namespace" {...initState} models={[loginModel]}>
     <App />
   </Provider>,
   document.getElementById("root")

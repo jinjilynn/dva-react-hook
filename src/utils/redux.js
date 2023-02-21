@@ -5,11 +5,12 @@ async function loop_dispatch(store) {
     if (!store.isDispatching.dispatching) {
       store.isDispatching.dispatching = true;
       const keys = Object.keys(store.dispatch_queue);
-      keys.forEach((it) => {
+      if (keys.length > 0) {
+        let it = keys[0];
         store.isDispatching.name = it.split("_")[0].split("/")[0];
-        store.REDUCER(store.dispatch_queue[it]);
+        await store.REDUCER(store.dispatch_queue[it]);
         delete store.dispatch_queue[it];
-      });
+      }
       store.isDispatching.dispatching = false;
       store.isDispatching.name = null;
     }

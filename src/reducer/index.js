@@ -1,5 +1,5 @@
 import { nanoid } from "nanoid";
-export default function reducer(action) {
+export default async function reducer(action) {
   const store = this;
   if (!store) {
     throw new Error("strange!! there is no store in reducer, please issue it.");
@@ -13,8 +13,9 @@ export default function reducer(action) {
         return;
       case "coverSet":
         store.runtime_state[action.name] = action.data;
-        store.offline &&
-          store.offlineInstance.setItem(action.name, action.data);
+        if (store.offline) {
+          await store.offlineInstance.setItem(action.name, action.data);
+        }
         if (!action.cancelUpdate) {
           const track1 = Object.values(store.REFRESH_CACHE);
           track1.forEach((it) => {
@@ -37,8 +38,12 @@ export default function reducer(action) {
           temp = temp[names[i]];
           i += 1;
         }
-        store.offline &&
-          store.offlineInstance.setItem(keyName, store.runtime_state[keyName]);
+        if (store.offline) {
+          await store.offlineInstance.setItem(
+            keyName,
+            store.runtime_state[keyName]
+          );
+        }
         if (!action.cancelUpdate) {
           const track2 = Object.values(store.REFRESH_CACHE);
           track2.forEach((it) => {
@@ -64,7 +69,9 @@ export default function reducer(action) {
     switch (action.type) {
       case "set":
         store.runtime_state[action.name] = data;
-        store.offline && store.offlineInstance.setItem(action.name, data);
+        if (store.offline) {
+          await store.offlineInstance.setItem(action.name, data);
+        }
         if (!action.cancelUpdate) {
           const track3 = Object.values(store.REFRESH_CACHE);
           track3.forEach((it) => {

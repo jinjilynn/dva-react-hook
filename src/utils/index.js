@@ -63,7 +63,7 @@ export function execBack(modelbacks, callbacks, value) {
   }
 }
 
-function getPartValue(names, store) {
+function _getPartValue(names, store) {
   let i = 0;
   let r;
   while (i < names.length) {
@@ -91,5 +91,28 @@ function getPartValue(names, store) {
     }
     i += 1;
   }
+  return clone(r, true);
+}
+
+function getPartValue(propertyNames, store) {
+  if (!propertyNames || !propertyNames.length) {
+    throw new Error("Property names array cannot be empty.");
+  }
+  const r = propertyNames.reduce((accumulator, propertyName, index) => {
+    const currentValue = index === 0 ? store.runtime_state : accumulator;
+    const nextValue = currentValue[propertyName];
+    if (
+      index < propertyNames.length - 1 &&
+      Object.prototype.toString.call(nextValue) !== "[object Object]"
+    ) {
+      throw new Error(
+        `${propertyName} is not an object, so the property['${
+          propertyNames[index + 1]
+        }'] cannot be reached. Please check your code.`
+      );
+    }
+
+    return nextValue;
+  }, {});
   return clone(r, true);
 }

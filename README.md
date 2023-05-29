@@ -94,6 +94,7 @@ If the separated Providers whose prop 'uniqueKey' are the same share the same st
 NOTE: To find the nearest Provider, I use a stack to store the Context. When iterating the stack, as soon as the nearest Provider is found, it will break the loop progress. So 'Warning: React has detected a change in the order of Hooks' may occur, please ignore it, it's okay.
 
 You can pass props (not named by models) to Provider, and the props will be initialized into 'state'. If you want to register models, you can use props named models.
+
 ##### ps: the props named models must be an array
 
 ```tsx
@@ -141,7 +142,7 @@ const loginModel = {
 };
 const initState = { count: 0 };
 ReactDOM.render(
-  <Provider noCached={ true } offlineConfig={ offline: true, autoRecover: true } uniqueKey="namespace" {...initState} models={[loginModel]}>
+  <Provider noCached={ true } offlineConfig={ offline: true, autoRecover: true, excludes:[] } uniqueKey="namespace" {...initState} models={[loginModel]}>
     <App />
   </Provider>,
   document.getElementById("root")
@@ -152,13 +153,12 @@ ReactDOM.render(
 
 You can use Dynamic to load components and models asynchronously.
 
-|    Props     |       Type        |                                                            Description                                                             |
-| :----------: | :---------------: | :--------------------------------------------------------------------------------------------------------------------------------: |
-| renderBefore |     Function      |                                                  You can do something before render                                                |
-|  component   |  React.ReactNode  |                                                    A React component to render                                                     |
+|    Props     |       Type        |                                                              Description                                                              |
+| :----------: | :---------------: | :-----------------------------------------------------------------------------------------------------------------------------------: |
+| renderBefore |     Function      |                                                  You can do something before render                                                   |
+|  component   |  React.ReactNode  |                                                      A React component to render                                                      |
 |    render    |     Function      | This allows for convenient inline rendering and wrapping, in addition to the ability to load a component with 'import' asynchronously |
-|    models    | Function \| Array |            Function should return an array. You can load a model asynchronously with 'import' or synchronously with an array          |
-
+|    models    | Function \| Array |           Function should return an array. You can load a model asynchronously with 'import' or synchronously with an array           |
 
 ```tsx
 import { Dynamic } from 'dva-react-hook';
@@ -211,9 +211,9 @@ It returns a pair of values: a state and a function that updates it.
 
 2. The function returned updates the model state, not partly. You can also pass a second argument (optional) of type Object.
 
-|   Property   |                                                              Description                                                               |      Type       |
-| :----------: | :------------------------------------------------------------------------------------------------------------------------------------: | :-------------: |
-| cancelUpdate |      If the value is true, the corresponding component's update will not be triggered, otherwise the update will be triggered.        |     boolean     |
+|   Property   |                                                        Description                                                         |      Type       |
+| :----------: | :------------------------------------------------------------------------------------------------------------------------: | :-------------: |
+| cancelUpdate | If the value is true, the corresponding component's update will not be triggered, otherwise the update will be triggered.  |     boolean     |
 |  callbacks   | After the function updates the model state is executed, The specified callbacks defined in the model will also be executed | string \| Array |
 
 ```javascript

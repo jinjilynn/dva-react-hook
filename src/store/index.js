@@ -18,9 +18,11 @@ function generateStore(key) {
     let dispatch;
     let offline = false;
     let offlineInstance;
+    let offlineExcludes = [];
     window[key] = {
       offline,
       offlineInstance,
+      offlineExcludes,
       dispatch,
       inner,
       MODELS,

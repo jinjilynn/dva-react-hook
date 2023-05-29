@@ -36,6 +36,7 @@ function Provider({
     uid_cache.current.push(_com_key);
     const [_store, _Context] = generateContext(_key, _new_uid);
     _store.offline = offlineConfig.offline === true;
+    _store.offlineExcludes = offlineConfig.excludes || [];
     _store.offlineInstance = localForage.createInstance({
       name: _key,
     });

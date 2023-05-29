@@ -8,12 +8,13 @@ export default async function reducer(action) {
     switch (action.type) {
       case "add":
         store.runtime_state[action.name] = action.initdate;
-        store.offline &&
-          store.offlineInstance.setItem(action.name, action.initdate);
+        if (store.offline && !store.offlineExcludes.includes(action.name)) {
+          await store.offlineInstance.setItem(action.name, action.initdate);
+        }
         return;
       case "coverSet":
         store.runtime_state[action.name] = action.data;
-        if (store.offline) {
+        if (store.offline && !store.offlineExcludes.includes(action.name)) {
           await store.offlineInstance.setItem(action.name, action.data);
         }
         if (!action.cancelUpdate) {
@@ -38,7 +39,7 @@ export default async function reducer(action) {
           temp = temp[names[i]];
           i += 1;
         }
-        if (store.offline) {
+        if (store.offline && !store.offlineExcludes.includes(keyName)) {
           await store.offlineInstance.setItem(
             keyName,
             store.runtime_state[keyName]
@@ -69,7 +70,7 @@ export default async function reducer(action) {
     switch (action.type) {
       case "set":
         store.runtime_state[action.name] = data;
-        if (store.offline) {
+        if (store.offline && !store.offlineExcludes.includes(action.name)) {
           await store.offlineInstance.setItem(action.name, data);
         }
         if (!action.cancelUpdate) {

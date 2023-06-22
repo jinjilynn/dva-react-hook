@@ -1,5 +1,4 @@
 import React from "react";
-import { get, execBack } from "../utils";
 
 const store = {};
 
@@ -31,8 +30,6 @@ function generateStore(key) {
       isDispatching,
       runtime_state,
       dispatch_queue,
-      get,
-      execBack,
     };
   }
   return window[key];

@@ -11,13 +11,14 @@ function generateStore(key) {
       dispatching: false,
       name: null,
     };
-    const dispatch_queue = {};
+    const dispatch_queue = [];
     let runtime_state = {};
     let REDUCER;
     let dispatch;
     let offline = false;
     let offlineInstance;
     let offlineExcludes = [];
+    let loopRunning = false;
     window[key] = {
       offline,
       offlineInstance,
@@ -30,6 +31,7 @@ function generateStore(key) {
       isDispatching,
       runtime_state,
       dispatch_queue,
+      loopRunning,
     };
   }
   return window[key];

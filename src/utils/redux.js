@@ -1,52 +1,37 @@
-import { nanoid } from "nanoid";
+function loop_dispatch(store) {
+  if (store.loopRunning) return;
+  store.loopRunning = true;
 
-async function loop_dispatch(store) {
-  while (true) {
-    if (!store.isDispatching.dispatching) {
-      store.isDispatching.dispatching = true;
-      const keys = Object.keys(store.dispatch_queue);
-      if (keys.length > 0) {
-        let it = keys[0];
-        store.isDispatching.name = it.split("_")[0].split("/")[0];
-        await store.REDUCER(store.dispatch_queue[it]);
-        delete store.dispatch_queue[it];
-      }
-      store.isDispatching.dispatching = false;
-      store.isDispatching.name = null;
+  while (store.dispatch_queue.length > 0) {
+    const action = store.dispatch_queue.shift();
+    if (action) {
+      store.REDUCER(action);
     }
-    await new Promise((resolve) => {
-      setTimeout(resolve, 0);
-    });
   }
+  store.loopRunning = false;
 }
 
 function dispatch(action) {
   const store = this;
+
   if (!store) {
     throw new Error(
       "strange!! there is no store in dispatch of utils, please issue it."
     );
   }
+
   if (!action) {
-    throw new Error("Actions must be plain objects. ");
+    throw new Error("Actions must be plain objects.");
   }
 
   if (typeof action.type === "undefined") {
     throw new Error('Actions may not have an undefined "type" property.');
   }
 
-  if (store.isDispatching.dispatching) {
-    action.temp_id = `${action.name}_${nanoid()}`;
-    store.dispatch_queue[action.temp_id] = action;
-  }
+  store.dispatch_queue.push(action);
 
-  try {
-    store.isDispatching.dispatching = true;
-    store.isDispatching.name = action.name.split("/")[0];
-    store.REDUCER(action);
-  } finally {
-    store.isDispatching.dispatching = false;
-    store.isDispatching.name = null;
+  if (!store.loopRunning) {
+    loop_dispatch(store);
   }
 }
 
@@ -87,9 +72,9 @@ export default function initStore(reducer, preloadedState, store) {
   }
   !store.REDUCER && (store.REDUCER = reducer.bind(store));
   !store.dispatch && (store.dispatch = dispatch.bind(store));
+  store.loopRunning = false;
   if (typeof preloadedState !== "undefined") {
     initfun.call(store, preloadedState);
   }
-  loop_dispatch(store);
   return [store.runtime_state, store.dispatch];
 }

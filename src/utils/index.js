@@ -26,7 +26,12 @@ function createDispatchFn(names, store, clonedState) {
     });
     if (callbacks && store.MODELS[names[0]]) {
       const model = store.MODELS[names[0]];
-      execBack(model.callbacks, callbacks, clonedState, store);
+      execBack(
+        model.callbacks,
+        callbacks,
+        { name: names.join("/"), value: clonedState },
+        store
+      );
     }
   };
 }
@@ -46,7 +51,7 @@ export function execBack(modelbacks, callbacks, value, store) {
 
 function executeCallback(modelbacks, callbackName, value, select) {
   if (typeof modelbacks[callbackName] === "function") {
-    modelbacks[callbackName]({ value, select });
+    modelbacks[callbackName]({ info: value, select });
   } else {
     console.error(`Callback ${callbackName} is not a function.`);
   }

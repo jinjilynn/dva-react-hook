@@ -54,7 +54,7 @@ export default function useDispatch(action) {
         store.dispatch({ type: "set", name: type[0], data, cancelUpdate });
         if (callbacks) {
           const value = clonedValue;
-          execBack(modelbacks, callbacks, value, store);
+          execBack(modelbacks, callbacks, { name: type[0], value }, store);
         }
       },
       select: (name) => {

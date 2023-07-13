@@ -28,7 +28,7 @@ export default async function reducer(action) {
         return;
       case "updateSet":
         const names = action.name.split("/");
-        const keyName = action.name.split("/")[0];
+        const keyName = names[0];
         const length = names.length;
         let temp = store.runtime_state;
         let i = 0;
@@ -48,7 +48,13 @@ export default async function reducer(action) {
         if (!action.cancelUpdate) {
           const track2 = Object.values(store.REFRESH_CACHE);
           track2.forEach((it) => {
-            it && action.name === it._s && it.set(nanoid());
+            const _names = [...names];
+            while (_names.length > 0) {
+              if (it && _names.join("/") === it._s) {
+                it.set(nanoid());
+              }
+              _names.pop();
+            }
           });
         }
         return;

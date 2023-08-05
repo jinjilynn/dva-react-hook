@@ -1,6 +1,6 @@
 # dva-react-hook
 
-[![NPM](https://img.shields.io/badge/npm-v2.1.4-blue)](https://www.npmjs.com/package/dva-react-hook)
+[![NPM](https://img.shields.io/badge/npm-v2.1.6-blue)](https://www.npmjs.com/package/dva-react-hook)
 [![size](https://img.shields.io/badge/size-105KB-green)]()
 
 > React Hooks based, concise、lightweight framework, supporting offline storage, like blob,bufferArray and all primitive types.
@@ -295,7 +295,6 @@ import { connect } from 'dva-react-hook';
 // You can call the connect decorator multiple times to inject multiple actions and models
 class Demo extends React.Component{
   render(){
-    console.log(this.props);
     return <div></div>
   }
 }

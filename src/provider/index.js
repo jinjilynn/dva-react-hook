@@ -16,6 +16,26 @@ function generateContext(_key, _uid) {
   return [_store, Context];
 }
 
+function mergeNestedObjects(obj1, obj2) {
+  Object.keys(obj2).forEach((key) => {
+    const value1 = obj1[key];
+    const value2 = obj2[key];
+
+    if (
+      typeof value1 === "object" &&
+      value1 !== null &&
+      typeof value2 === "object" &&
+      value2 !== null
+    ) {
+      mergeNestedObjects(value1, value2);
+    } else {
+      obj1[key] = value2;
+    }
+  });
+
+  return obj1;
+}
+
 function Provider({
   uniqueKey,
   models,
@@ -49,12 +69,13 @@ function Provider({
       }
     };
     if (offlineConfig.autoRecover === true) {
+      _init();
       _store.offlineInstance
         .iterate((value, key) => {
-          _store.runtime_state[key] = value;
+          const _v = mergeNestedObjects(_store.runtime_state[key] || {}, value);
+          _store.runtime_state[key] = _v;
         })
-        .then((value) => {
-          _init();
+        .then(() => {
           setCombinedWithStore({ com: _Context.Provider, store: _store });
         })
         .catch((err) => {

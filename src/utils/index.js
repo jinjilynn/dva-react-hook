@@ -1,10 +1,11 @@
 import clone from "../clone";
+import { _split } from "../reducer";
 
 export function get(name, store) {
   validateStore(store);
   validateName(name);
 
-  const names = name.split("/");
+  const names = name.split(_split);
   const clonedState = getClonedState(names, store);
 
   return [clonedState, createDispatchFn(names, store, clonedState)];
@@ -18,8 +19,8 @@ function getClonedState(names, store) {
 function createDispatchFn(names, store, clonedState) {
   return (value, { cancelUpdate, callbacks } = {}) => {
     store.dispatch({
-      type: names.length === 1 ? "coverSet" : "updateSet",
-      name: names.join("/"),
+      type: "modify",
+      name: names.join(_split),
       data: value,
       inner: store.inner,
       cancelUpdate,
@@ -29,7 +30,7 @@ function createDispatchFn(names, store, clonedState) {
       execBack(
         model.callbacks,
         callbacks,
-        { name: names.join("/"), value: clonedState },
+        { name: names.join(_split), value: clonedState },
         store
       );
     }

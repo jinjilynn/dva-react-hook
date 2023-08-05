@@ -1,4 +1,74 @@
 import { nanoid } from "nanoid";
+import clone from "../clone";
+
+export const _split = "/";
+
+function isObject(value) {
+  const type = typeof value;
+  return value != null && type === "object";
+}
+
+function getPathArray(path) {
+  if (path.endsWith(_split)) {
+    path = path.slice(0, -1);
+  }
+  return path.split(_split);
+}
+
+function createNestedObject(parts, initvalue) {
+  if (typeof parts === "string") {
+    parts = getPathArray(parts);
+  }
+  let obj = {};
+  let currentPart = obj;
+  for (let i = 0; i < parts.length; i++) {
+    const part = parts[i];
+    currentPart[part] = i === parts.length - 1 ? initvalue : {};
+    currentPart = currentPart[part];
+  }
+  return obj;
+}
+
+function filterExcludes(exarray, name) {
+  if (exarray && Array.isArray(exarray)) {
+    return exarray.filter((path) => getPathArray(path)[0] === name);
+  }
+  return [];
+}
+
+function deleteNestedKey(obj, parts) {
+  if (typeof parts === "string") {
+    parts = getPathArray(parts);
+  }
+  parts = parts.slice(1);
+  let currentPart = obj;
+  for (let i = 0; i < parts.length - 1; i++) {
+    const part = parts[i];
+    if (!isObject(currentPart[part])) {
+      return obj;
+    }
+    currentPart = currentPart[part];
+  }
+
+  delete currentPart[parts[parts.length - 1]];
+
+  return obj;
+}
+
+function set(obj, path, value) {
+  const pathParts = Array.isArray(path) ? path : getPathArray(path);
+  let current = obj;
+  for (let i = 0; i < pathParts.length; i++) {
+    if (i === pathParts.length - 1) {
+      current[pathParts[i]] = value;
+    } else if (!current[pathParts[i]]) {
+      current[pathParts[i]] = {};
+    }
+    current = current[pathParts[i]];
+  }
+  return obj;
+}
+
 export default async function reducer(action) {
   const store = this;
   if (!store) {
@@ -7,83 +77,52 @@ export default async function reducer(action) {
   if (action.inner === store.inner) {
     switch (action.type) {
       case "add":
-        store.runtime_state[action.name] = action.initdate;
-        if (store.offline && !store.offlineExcludes.includes(action.name)) {
-          await store.offlineInstance.setItem(action.name, action.initdate);
-        }
-        return;
-      case "coverSet":
-        store.runtime_state[action.name] = action.data;
-        if (store.offline && !store.offlineExcludes.includes(action.name)) {
-          await store.offlineInstance.setItem(action.name, action.data);
-        }
-        if (!action.cancelUpdate) {
-          const track1 = Object.values(store.REFRESH_CACHE);
-          track1.forEach((it) => {
-            if (it) {
-              action.name === it._s.split("/")[0] && it.set(nanoid());
-            }
-          });
-        }
-        return;
-      case "updateSet":
-        const names = action.name.split("/");
-        const keyName = names[0];
-        const length = names.length;
-        let temp = store.runtime_state;
-        let i = 0;
-        while (i < length) {
-          if (i === length - 2) {
-            temp[names[i]][names[i + 1]] = action.data;
+        const _parts = getPathArray(action.name);
+        const _state = createNestedObject(_parts, action.initdate);
+        store.runtime_state = { ...store.runtime_state, ..._state };
+        const keys = await store.offlineInstance.keys();
+        if (
+          store.offline &&
+          !store.offlineExcludes.includes(_parts[0]) &&
+          !keys.includes(_parts[0])
+        ) {
+          const excludes = filterExcludes(store.offlineExcludes, _parts[0]);
+          let valuefiltered = clone(_state[_parts[0]], true);
+          if (excludes.length > 0) {
+            excludes.forEach((path) => {
+              valuefiltered = deleteNestedKey(valuefiltered, path);
+            });
           }
-          temp = temp[names[i]];
-          i += 1;
+          await store.offlineInstance.setItem(_parts[0], valuefiltered);
         }
-        if (store.offline && !store.offlineExcludes.includes(keyName)) {
-          await store.offlineInstance.setItem(
-            keyName,
-            store.runtime_state[keyName]
-          );
-        }
+        return;
+      case "modify":
+        const names = getPathArray(action.name);
+        const temp_state = set(store.runtime_state, names, action.data);
+        store.runtime_state = { ...temp_state };
         if (!action.cancelUpdate) {
-          const track2 = Object.values(store.REFRESH_CACHE);
-          track2.forEach((it) => {
+          const track = Object.values(store.REFRESH_CACHE);
+          track.forEach((it) => {
             const _names = [...names];
             while (_names.length > 0) {
-              if (it && _names.join("/") === it._s) {
+              if (it && _names.join(_split) === it._s) {
                 it.set(nanoid());
               }
               _names.pop();
             }
           });
         }
-        return;
-      default: {
-        throw new Error(`Unhandled action type: ${action.type}`);
-      }
-    }
-  } else {
-    if (typeof action.name !== "string") {
-      throw new Error("name must be a string");
-    }
-    if (!store.runtime_state.hasOwnProperty(action.name)) {
-      throw new Error(
-        `you dont not have the state name -- ${action.name} right now !`
-      );
-    }
-    const data =
-      typeof action.data === "function" ? action.data() : action.data;
-    switch (action.type) {
-      case "set":
-        store.runtime_state[action.name] = data;
-        if (store.offline && !store.offlineExcludes.includes(action.name)) {
-          await store.offlineInstance.setItem(action.name, data);
-        }
-        if (!action.cancelUpdate) {
-          const track3 = Object.values(store.REFRESH_CACHE);
-          track3.forEach((it) => {
-            it && it._s.split("/")[0] === action.name && it.set(nanoid());
-          });
+        if (store.offline) {
+          if (store.offline && !store.offlineExcludes.includes(names[0])) {
+            let valuefiltered = clone(temp_state[names[0]], true);
+            const excludes = filterExcludes(store.offlineExcludes, names[0]);
+            if (excludes.length > 0) {
+              excludes.forEach((path) => {
+                valuefiltered = deleteNestedKey(valuefiltered, path);
+              });
+            }
+            await store.offlineInstance.setItem(names[0], valuefiltered);
+          }
         }
         return;
       default: {

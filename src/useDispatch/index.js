@@ -1,6 +1,7 @@
 import { useNearestStore } from "../store";
 import { get, execBack } from "../utils";
 import clone from "../clone";
+import { _split } from "../reducer";
 
 export default function useDispatch(action) {
   const store = useNearestStore();
@@ -18,12 +19,12 @@ export default function useDispatch(action) {
   if (typeof action.type !== "string") {
     throw new Error("your must be a string");
   }
-  if (action.type.indexOf("/") === -1) {
+  if (action.type.indexOf(_split) === -1) {
     throw new Error("you must do some effects in your type");
   }
 
   let { type, ...others } = action;
-  type = type.split("/");
+  type = type.split(_split);
   if (type[0].length === 0) {
     throw new Error("can not resolve the empty model name");
   }
@@ -51,7 +52,13 @@ export default function useDispatch(action) {
       ...others,
       state: clonedValue,
       setState: (data, { cancelUpdate, callbacks } = {}) => {
-        store.dispatch({ type: "set", name: type[0], data, cancelUpdate });
+        store.dispatch({
+          type: "modify",
+          name: type[0],
+          inner: store.inner,
+          data,
+          cancelUpdate,
+        });
         if (callbacks) {
           const value = clonedValue;
           execBack(modelbacks, callbacks, { name: type[0], value }, store);

@@ -20,6 +20,6 @@ export default function useModel(name, update) {
     return () => {
       !update && delete store.REFRESH_CACHE[uid];
     };
-  }, []);
+  }, [name]);
   return get(name, store);
 }

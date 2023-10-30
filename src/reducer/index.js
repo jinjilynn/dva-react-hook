@@ -102,7 +102,11 @@ export default async function reducer(action) {
         store.runtime_state = { ...temp_state };
         if (!action.cancelUpdate) {
           const track = Object.values(store.REFRESH_CACHE);
+          const parentTrack = `${names.join(_split)}${_split}`;
           track.forEach((it) => {
+            if (it && it._s.startsWith(parentTrack)) {
+              it.set(nanoid());
+            }
             const _names = [...names];
             while (_names.length > 0) {
               if (it && _names.join(_split) === it._s) {

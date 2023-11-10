@@ -51,8 +51,8 @@ export default function useDispatch(action) {
     return effect(...rest, {
       ...others,
       state: clonedValue,
-      setState: (data, { cancelUpdate, callbacks } = {}) => {
-        store.dispatch({
+      setState: async (data, { cancelUpdate, callbacks } = {}) => {
+        await store.dispatch({
           type: "modify",
           name: type[0],
           inner: store.inner,

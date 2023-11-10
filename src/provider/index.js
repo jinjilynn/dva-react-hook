@@ -1,6 +1,7 @@
 import React from "react";
 import * as localForage from "localforage";
 import { nanoid } from "nanoid";
+import { merge } from "lodash-es";
 import store, { setStoreByKey, getStoreByKey } from "../store";
 import reducer from "../reducer";
 import initStore from "../utils/redux";
@@ -14,26 +15,6 @@ function generateContext(_key, _uid) {
   }
   store[`${_key}_${_uid}`] = Context;
   return [_store, Context];
-}
-
-function mergeNestedObjects(obj1, obj2) {
-  Object.keys(obj2).forEach((key) => {
-    const value1 = obj1[key];
-    const value2 = obj2[key];
-
-    if (
-      typeof value1 === "object" &&
-      value1 !== null &&
-      typeof value2 === "object" &&
-      value2 !== null
-    ) {
-      mergeNestedObjects(value1, value2);
-    } else {
-      obj1[key] = value2;
-    }
-  });
-
-  return obj1;
 }
 
 function Provider({
@@ -60,19 +41,20 @@ function Provider({
     _store.offlineInstance = localForage.createInstance({
       name: _key,
     });
-    const _init = () => {
-      initStore(reducer, { ...rest }, _store);
+    const _init = async () => {
+      await initStore(reducer, { ...rest }, _store);
       if (Array.isArray(models)) {
-        models.forEach((_it) => {
-          registeModel(_it, _store);
-        });
+        for (let i = 0; i < models.length; i++) {
+          const _it = models[i];
+          await registeModel(_it, _store);
+        }
       }
     };
-    if (offlineConfig.autoRecover === true) {
-      _init();
+    const recover = async () => {
+      await _init();
       _store.offlineInstance
         .iterate((value, key) => {
-          const _v = mergeNestedObjects(_store.runtime_state[key] || {}, value);
+          const _v = merge(_store.runtime_state[key] || {}, value);
           _store.runtime_state[key] = _v;
         })
         .then(() => {
@@ -81,9 +63,15 @@ function Provider({
         .catch((err) => {
           console.error(`recover from offline database failed:${err}`);
         });
-    } else {
-      _init();
+    };
+    const notrecover = async () => {
+      await _init();
       setCombinedWithStore({ com: _Context.Provider, store: _store });
+    };
+    if (offlineConfig.autoRecover === true) {
+      recover();
+    } else {
+      notrecover();
     }
     return () => {
       uid_cache.current.forEach((item) => {

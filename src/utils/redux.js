@@ -1,11 +1,10 @@
-function loop_dispatch(store) {
+async function loop_dispatch(store) {
   if (store.loopRunning) return;
   store.loopRunning = true;
-
   while (store.dispatch_queue.length > 0) {
     const action = store.dispatch_queue.shift();
     if (action) {
-      store.REDUCER(action);
+      await store.REDUCER(action);
     }
   }
   store.loopRunning = false;
@@ -33,22 +32,32 @@ function dispatch(action) {
   if (!store.loopRunning) {
     loop_dispatch(store);
   }
+
+  return new Promise((resolve) => {
+    const interval = setInterval(() => {
+      if (!store.loopRunning) {
+        clearInterval(interval);
+        resolve(action);
+      }
+    }, 0);
+  });
 }
 
-function initfun($i) {
+async function initfun($i) {
   const store = this;
   if ($i && typeof $i == "object" && !Array.isArray($i)) {
     const keys = Object.keys($i);
     if (keys.length > 0) {
-      keys.forEach((key) => {
+      for (let i = 0; i < keys.length; i++) {
+        const key = keys[i];
         if (!store.runtime_state.hasOwnProperty(key))
-          store.dispatch({
+          await store.dispatch({
             type: "add",
             name: key,
             initdate: $i[key],
             inner: store.inner,
           });
-      });
+      }
     }
   }
 }
@@ -66,7 +75,7 @@ export function restoreForce(state) {
   }
 }
 
-export default function initStore(reducer, preloadedState, store) {
+export default async function initStore(reducer, preloadedState, store) {
   if (typeof reducer !== "function") {
     throw new Error("Expected the reducer to be a function.");
   }
@@ -74,7 +83,7 @@ export default function initStore(reducer, preloadedState, store) {
   !store.dispatch && (store.dispatch = dispatch.bind(store));
   store.loopRunning = false;
   if (typeof preloadedState !== "undefined") {
-    initfun.call(store, preloadedState);
+    await initfun.call(store, preloadedState);
   }
   return [store.runtime_state, store.dispatch];
 }

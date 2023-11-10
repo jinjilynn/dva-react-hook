@@ -1,7 +1,7 @@
 import React from "react";
 import { useNearestStore } from "../store";
 
-export function registeModel(_, store) {
+export async function registeModel(_, store) {
   if (Object.prototype.toString.call(_) !== "[object Object]") {
     throw new Error("your model must be an object");
   }
@@ -28,7 +28,7 @@ export function registeModel(_, store) {
     if (typeof _.init === "function") {
       data = _.init();
     }
-    store.dispatch({
+    await store.dispatch({
       type: "add",
       name: _.name,
       initdate: data,
@@ -36,7 +36,6 @@ export function registeModel(_, store) {
     });
   }
 }
-
 
 function Dynamic(props) {
   const store = useNearestStore();
@@ -54,7 +53,7 @@ function Dynamic(props) {
     renderBefore?.();
 
     const getModelPromises = () => {
-      if (typeof models === 'function') return [models()];
+      if (typeof models === "function") return [models()];
       if (Array.isArray(models)) return models.map((it) => Promise.resolve(it));
       return [];
     };
@@ -63,8 +62,10 @@ function Dynamic(props) {
 
     Promise.all(asyncResources).then((ret) => {
       ret.forEach((m) => {
-        const modelsToRegister = (m.default || m);
-        const modelArray = Array.isArray(modelsToRegister) ? modelsToRegister : [modelsToRegister];
+        const modelsToRegister = m.default || m;
+        const modelArray = Array.isArray(modelsToRegister)
+          ? modelsToRegister
+          : [modelsToRegister];
         modelArray.forEach((model) => registeModel(model, store));
       });
       setMount({ loaded: true });

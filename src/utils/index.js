@@ -17,8 +17,8 @@ function getClonedState(names, store) {
 }
 
 function createDispatchFn(names, store, clonedState) {
-  return (value, { cancelUpdate, callbacks } = {}) => {
-    store.dispatch({
+  return async (value, { cancelUpdate, callbacks } = {}) => {
+    const result = await store.dispatch({
       type: "modify",
       name: names.join(_split),
       data: value,
@@ -34,6 +34,7 @@ function createDispatchFn(names, store, clonedState) {
         store
       );
     }
+    return result;
   };
 }
 

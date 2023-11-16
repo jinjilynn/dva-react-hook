@@ -1,7 +1,7 @@
 import React from "react";
 import * as localForage from "localforage";
 import { nanoid } from "nanoid";
-import { merge } from "lodash-es";
+import { mergeWith } from "lodash-es";
 import store, { setStoreByKey, getStoreByKey } from "../store";
 import reducer from "../reducer";
 import initStore from "../utils/redux";
@@ -38,6 +38,7 @@ function Provider({
     const [_store, _Context] = generateContext(_key, _new_uid);
     _store.offline = offlineConfig.offline === true;
     _store.offlineExcludes = offlineConfig.excludes || [];
+    const customizer = offlineConfig.customizer;
     _store.offlineInstance = localForage.createInstance({
       name: _key,
     });
@@ -54,7 +55,11 @@ function Provider({
       await _init();
       _store.offlineInstance
         .iterate((value, key) => {
-          const _v = merge(_store.runtime_state[key] || {}, value);
+          const _v = mergeWith(
+            _store.runtime_state[key] || {},
+            value,
+            customizer
+          );
           _store.runtime_state[key] = _v;
         })
         .then(() => {

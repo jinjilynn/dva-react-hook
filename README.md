@@ -1,6 +1,6 @@
 # dva-react-hook
 
-[![NPM](https://img.shields.io/badge/npm-v2.2.0-blue)](https://www.npmjs.com/package/dva-react-hook)
+[![NPM](https://img.shields.io/badge/npm-v2.2.1-blue)](https://www.npmjs.com/package/dva-react-hook)
 [![size](https://img.shields.io/badge/size-106KB-green)]()
 
 > React Hooks based, concise、lightweight framework, supporting offline storage, like blob,bufferArray and all primitive types.
@@ -179,8 +179,8 @@ import { Dynamic } from 'dva-react-hook';
     init: Function | Object | Number | Array | ..., //optional --default value is {}
     effects:{
       // Defining an async function is recommended, but it is not required
-      'some-effects-name': async ({ state, setState, select }) => {
-        // { state, setState, select } this parameter is injected by the framework. it is always the last one in arguments. If you call this function by passing other parameters, the other parameters must be added before the injected parameter like this: async (args1, args2, { state, setState, select }) => {}, Otherwise, you will encounter errors
+      'some-effects-name': async ({ state, setState, select, getDispatch }) => {
+        // { state, setState, select, getDispatch } this parameter is injected by the framework. it is always the last one in arguments. If you call this function by passing other parameters, the other parameters must be added before the injected parameter like this: async (args1, args2, { state, setState, select, getDispatch }) => {}, Otherwise, you will encounter errors
 
         // state: state.value is the state of this model, You can also declare value ( state:{value}) to get the state
 

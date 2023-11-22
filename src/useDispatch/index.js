@@ -4,12 +4,6 @@ import clone from "../clone";
 import { _split } from "../reducer";
 
 export default function useDispatch(action) {
-  const store = useNearestStore();
-  if (!store) {
-    throw new Error(
-      "strange!! there is no store in useDispatch, please issue it."
-    );
-  }
   if (Object.prototype.toString.call(action) !== "[object Object]") {
     throw new Error("action in useDispatch must be an Object");
   }
@@ -22,7 +16,13 @@ export default function useDispatch(action) {
   if (action.type.indexOf(_split) === -1) {
     throw new Error("you must do some effects in your type");
   }
-
+  const store = action.store || useNearestStore();
+  if (!store) {
+    throw new Error(
+      "strange!! there is no store in useDispatch, please issue it."
+    );
+  }
+  action.store = store;
   let { type, ...others } = action;
   type = type.split(_split);
   if (type[0].length === 0) {
@@ -66,6 +66,9 @@ export default function useDispatch(action) {
       },
       select: (name) => {
         return get(name, store);
+      },
+      getDispatch: (action) => {
+        return useDispatch({ ...action, store });
       },
     });
   };

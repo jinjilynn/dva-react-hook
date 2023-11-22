@@ -1,11 +1,11 @@
 import Provider from "./provider";
-import clone from "./clone";
+import { get } from "./utils";
 
-export { Provider };
-export { clone };
 export { default as connect } from "./connect";
 export { default as Dynamic } from "./dynamic";
 export { default as useAdd } from "./useAdd";
 export { default as useDispatch } from "./useDispatch";
 export { default as useModel } from "./useModel";
+export { get };
+
 export default Provider;

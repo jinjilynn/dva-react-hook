@@ -7,18 +7,21 @@ import reducer from "../reducer";
 import initStore from "../utils/redux";
 import { registeModel } from "../dynamic";
 
-function generateContext(_key, _uid) {
+function generateContext(_key, _uid, nested) {
   const Context = React.createContext();
   let _store = getStoreByKey(_key);
   if (!_store) {
     _store = setStoreByKey(_key);
   }
-  store[`${_key}_${_uid}`] = Context;
+  if (nested === true) {
+    store[`${_key}_${_uid}`] = Context;
+  }
   return [_store, Context];
 }
 
 function Provider({
   uniqueKey,
+  nested = true,
   models,
   offlineConfig = {},
   noCached,
@@ -35,7 +38,7 @@ function Provider({
     const _key = (uniqueKey && uniqueKey.toString()) || "default";
     const _com_key = `${_key}_${_new_uid}`;
     uid_cache.current.push(_com_key);
-    const [_store, _Context] = generateContext(_key, _new_uid);
+    const [_store, _Context] = generateContext(_key, _new_uid, nested);
     _store.offline = offlineConfig.offline === true;
     _store.offlineExcludes = offlineConfig.excludes || [];
     const customizer = offlineConfig.customizer;

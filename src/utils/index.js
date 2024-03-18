@@ -30,7 +30,10 @@ function createDispatchFn(names, store, clonedState) {
       execBack(
         model.callbacks,
         callbacks,
-        { name: names.join(_split), value: clonedState },
+        {
+          name: names.join(_split),
+          value: { pre: clonedState, current: value },
+        },
         store
       );
     }

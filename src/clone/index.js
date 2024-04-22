@@ -14,7 +14,7 @@ function isBlob(object) {
   return object instanceof Blob;
 }
 
-export function clone(obj, offline = false) {
+export default function clone(obj, offline = false) {
   return cloneDeepWith(obj, (value) => {
     if (isFunction(value)) {
       return offline ? null : value;

@@ -1,12 +1,8 @@
 import { nanoid } from "nanoid";
 import clone from "../clone";
+import { isPlainObject } from "lodash-es";
 
 export const _split = "/";
-
-function isObject(value) {
-  const type = typeof value;
-  return value != null && type === "object";
-}
 
 function getPathArray(path) {
   if (path.endsWith(_split)) {
@@ -44,7 +40,7 @@ function deleteNestedKey(obj, parts) {
   let currentPart = obj;
   for (let i = 0; i < parts.length - 1; i++) {
     const part = parts[i];
-    if (!isObject(currentPart[part])) {
+    if (!isPlainObject(currentPart[part])) {
       return obj;
     }
     currentPart = currentPart[part];
@@ -58,14 +54,13 @@ function deleteNestedKey(obj, parts) {
 function set(obj, path, value) {
   const pathParts = Array.isArray(path) ? path : getPathArray(path);
   let current = obj;
-  for (let i = 0; i < pathParts.length; i++) {
-    if (i === pathParts.length - 1) {
-      current[pathParts[i]] = value;
-    } else if (!current[pathParts[i]]) {
+  for (let i = 0; i < pathParts.length - 1; i++) {
+    if (!isPlainObject(current[pathParts[i]])) {
       current[pathParts[i]] = {};
     }
     current = current[pathParts[i]];
   }
+  current[pathParts[pathParts.length - 1]] = value;
   return obj;
 }
 
@@ -99,7 +94,6 @@ export default async function reducer(action) {
       case "modify":
         const names = getPathArray(action.name);
         const temp_state = set(store.runtime_state, names, action.data);
-        store.runtime_state = { ...temp_state };
         if (!action.cancelUpdate) {
           const track = Object.values(store.REFRESH_CACHE);
           const parentTrack = `${names.join(_split)}${_split}`;

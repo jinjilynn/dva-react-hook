@@ -1,4 +1,5 @@
 import clone from "../clone";
+import { isPlainObject } from "lodash-es";
 import { _split } from "../reducer";
 
 export function get(name, store) {
@@ -90,7 +91,7 @@ function getValue(propertyNames, store) {
     if (
       propertyNames.length > 1 &&
       index < propertyNames.length - 1 &&
-      Object.prototype.toString.call(nextValue) !== "[object Object]"
+      !isPlainObject(nextValue)
     ) {
       throw new Error(
         `${propertyName} is not an object, so the property['${
@@ -101,5 +102,5 @@ function getValue(propertyNames, store) {
 
     return nextValue;
   }, {});
-  return clone(r, true);
+  return clone(r);
 }

@@ -47,7 +47,7 @@ export default function useDispatch(action) {
   const modelbacks = model.callbacks;
 
   const effectwrapped = (...rest) => {
-    const clonedValue = clone(store.runtime_state[type[0]], true);
+    const clonedValue = clone(store.runtime_state[type[0]]);
     return effect(...rest, {
       ...others,
       state: clonedValue,

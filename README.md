@@ -1,6 +1,6 @@
 # dva-react-hook
 
-[![NPM](https://img.shields.io/badge/npm-v2.2.6-blue)](https://www.npmjs.com/package/dva-react-hook)
+[![NPM](https://img.shields.io/badge/npm-v2.2.7-blue)](https://www.npmjs.com/package/dva-react-hook)
 [![size](https://img.shields.io/badge/size-106KB-green)]()
 
 > React Hooks based, concise、lightweight framework, supporting offline storage, like blob,bufferArray and all primitive types.
@@ -17,6 +17,7 @@
   - [`useDispatch()`](#useDispatch)
   - [`connect()`](#connect)
   - [`useAdd()`](#useAdd)
+  - [`useChange()`](#useChange)
 - [Example](#Example)
 - [License](#license)
 
@@ -306,6 +307,20 @@ class Demo extends React.Component{
 
 If you want to dynamically inject model state, you can use it.
 useAdd has three arguments: name, initdata, and once.
+
+### `useChange`
+
+```javascript
+import { useChange } from "dva-react-hook";
+const App = (props)=>{
+  useChange((action,state)=>{
+    console.log(action,state);
+  });
+  return <div>
+    <span>{props.name}</span>
+    <button onClick={()=>{props.changeName('lynn')}}>change name</button>
+}
+```
 
 ```javascript
 import { useAdd } from "dva-react-hook";

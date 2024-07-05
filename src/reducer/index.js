@@ -90,7 +90,7 @@ export default async function reducer(action) {
           }
           await store.offlineInstance.setItem(_parts[0], valuefiltered);
         }
-        return action.initdate;
+        break;
       case "modify":
         const names = getPathArray(action.name);
         const temp_state = set(store.runtime_state, names, action.data);
@@ -122,10 +122,14 @@ export default async function reducer(action) {
             await store.offlineInstance.setItem(names[0], valuefiltered);
           }
         }
-        return action.data;
+        break;
       default: {
         throw new Error(`Unhandled action type: ${action.type}`);
       }
     }
+    const subscribes = Object.values(store.changeSubscribes);
+    subscribes.forEach((fn) => {
+      fn(action, store.runtime_state);
+    });
   }
 }

@@ -129,7 +129,7 @@ export default async function reducer(action) {
     }
     const subscribes = Object.values(store.changeSubscribes);
     subscribes.forEach((fn) => {
-      fn(action, store.runtime_state);
+      fn(action, clone(store.runtime_state, true), store.runtime_state);
     });
   }
 }

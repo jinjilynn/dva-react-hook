@@ -1,7 +1,7 @@
 # dva-react-hook
 
-[![NPM](https://img.shields.io/badge/npm-v2.2.7-blue)](https://www.npmjs.com/package/dva-react-hook)
-[![size](https://img.shields.io/badge/size-106KB-green)]()
+[![NPM](https://img.shields.io/badge/npm-v2.2.8-blue)](https://www.npmjs.com/package/dva-react-hook)
+[![size](https://img.shields.io/badge/size-105KB-green)]()
 
 > React Hooks based, concise、lightweight framework, supporting offline storage, like blob,bufferArray and all primitive types.
 
@@ -313,8 +313,8 @@ useAdd has three arguments: name, initdata, and once.
 ```javascript
 import { useChange } from "dva-react-hook";
 const App = (props)=>{
-  useChange((action,state)=>{
-    console.log(action,state);
+  useChange((action,then_state,latest_state)=>{
+    console.log(action,then_state,latest_state);
   });
   return <div>
     <span>{props.name}</span>

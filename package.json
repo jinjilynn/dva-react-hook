@@ -1,6 +1,6 @@
 {
   "name": "dva-react-hook",
-  "version": "2.2.7",
+  "version": "2.2.8",
   "description": "React Hooks based, concise、lightweight framework",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

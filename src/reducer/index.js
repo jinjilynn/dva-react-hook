@@ -4,7 +4,7 @@ import { isPlainObject } from "lodash-es";
 
 export const _split = "/";
 
-function getPathArray(path) {
+export function getPathArray(path) {
   if (path.endsWith(_split)) {
     path = path.slice(0, -1);
   }

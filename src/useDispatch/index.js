@@ -64,8 +64,8 @@ export default function useDispatch(action) {
           execBack(modelbacks, callbacks, { name: type[0], value }, store);
         }
       },
-      select: (name) => {
-        return get(name, store);
+      select: (name, options) => {
+        return get(name, store, options);
       },
       getDispatch: (action) => {
         return useDispatch({ ...action, store });

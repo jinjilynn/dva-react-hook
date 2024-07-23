@@ -1,19 +1,26 @@
 import clone from "../clone";
 import { isPlainObject } from "lodash-es";
-import { _split } from "../reducer";
+import { _split, getPathArray } from "../reducer";
 
-export function get(name, store) {
+export function get(
+  name,
+  store,
+  options = {
+    autoCreate: false,
+    defaultValue: undefined,
+  }
+) {
   validateStore(store);
   validateName(name);
 
-  const names = name.split(_split);
-  const clonedState = getClonedState(names, store);
+  const names = getPathArray(name);
+  const clonedState = getClonedState(names, store, options);
 
   return [clonedState, createDispatchFn(names, store, clonedState)];
 }
 
-function getClonedState(names, store) {
-  const state = getValue(names, store);
+function getClonedState(names, store, options) {
+  const state = getValue(names, store, options);
   return state;
 }
 
@@ -81,25 +88,33 @@ function validateModelbacks(modelbacks) {
   }
 }
 
-function getValue(propertyNames, store) {
+function getValue(propertyNames, store, options) {
   if (!propertyNames || !propertyNames.length) {
     throw new Error("Property names array cannot be empty.");
   }
+  let autocreated = false;
   const r = propertyNames.reduce((accumulator, propertyName, index) => {
     const currentValue = index === 0 ? store.runtime_state : accumulator;
-    const nextValue = currentValue[propertyName];
+    let nextValue = currentValue[propertyName];
     if (
       propertyNames.length > 1 &&
       index < propertyNames.length - 1 &&
       !isPlainObject(nextValue)
     ) {
-      throw new Error(
-        `${propertyName} is not an object, so the property['${
-          propertyNames[index + 1]
-        }'] cannot be reached. Please check your code.`
-      );
+      if (options.autoCreate) {
+        autocreated = true;
+        nextValue = currentValue[propertyName] = {};
+      } else {
+        throw new Error(
+          `${propertyName} is not an object, so the property['${
+            propertyNames[index + 1]
+          }'] cannot be reached. Please check your code.`
+        );
+      }
     }
-
+    if (index === propertyNames.length - 1 && autocreated) {
+      nextValue = currentValue[propertyName] = options.defaultValue;
+    }
     return nextValue;
   }, {});
   return clone(r);

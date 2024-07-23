@@ -1,6 +1,6 @@
 # dva-react-hook
 
-[![NPM](https://img.shields.io/badge/npm-v2.2.8-blue)](https://www.npmjs.com/package/dva-react-hook)
+[![NPM](https://img.shields.io/badge/npm-v2.2.9-blue)](https://www.npmjs.com/package/dva-react-hook)
 [![size](https://img.shields.io/badge/size-105KB-green)]()
 
 > React Hooks based, concise、lightweight framework, supporting offline storage, like blob,bufferArray and all primitive types.
@@ -131,7 +131,7 @@ const loginModel = {
     age: null,
   },
   effects: {
-    login: async ( { setState }) => {
+    login: async ( { setState,state,select,getDispatch }) => {
       const _r = await loginService();
       setState({
         name: "lynn",
@@ -216,6 +216,7 @@ It returns a pair of values: a state and a function that updates it.
 | :----------: | :------------------------------------------------------------------------------------------------------------------------: | :-------------: |
 | cancelUpdate | If the value is true, the corresponding component's update will not be triggered, otherwise the update will be triggered.  |     boolean     |
 |  callbacks   | After the function updates the model state is executed, The specified callbacks defined in the model will also be executed | string \| Array |
+|   options    |                                   default { autoCreate: false, defaultValue:undefined }                                    |     Object      |
 
 ```javascript
 import React from 'react';
@@ -268,7 +269,7 @@ const loginaction = useDispatch({ type: "login/login", otherproperties: "" });
 
 //so your code in model maybe like this   async login({ name,pass },{ state, setState, select, otherproperties }){}
 
-loginaction({ name, pass })
+loginaction({ name, pass }, { state, select, setState, getDispatch })
   .then((data) => {
     // do something
   })

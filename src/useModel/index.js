@@ -3,7 +3,7 @@ import { nanoid } from "nanoid";
 import { get } from "../utils";
 import { useNearestStore } from "../store";
 
-export default function useModel(name, cancelupdate, _store) {
+export default function useModel(name, cancelupdate, _store, options) {
   const store = _store || useNearestStore();
   if (!store) {
     throw new Error(
@@ -21,5 +21,5 @@ export default function useModel(name, cancelupdate, _store) {
       !cancelupdate && delete store.REFRESH_CACHE[uid];
     };
   }, [name]);
-  return get(name, store);
+  return get(name, store, options);
 }

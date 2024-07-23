@@ -11,6 +11,19 @@ export function getPathArray(path) {
   return path.split(_split);
 }
 
+export async function endurance(store, names, temp_state) {
+  if (store.offline && !store.offlineExcludes.includes(names[0])) {
+    let valuefiltered = clone(temp_state[names[0]], true);
+    const excludes = filterExcludes(store.offlineExcludes, names[0]);
+    if (excludes.length > 0) {
+      excludes.forEach((path) => {
+        valuefiltered = deleteNestedKey(valuefiltered, path);
+      });
+    }
+    await store.offlineInstance.setItem(names[0], valuefiltered);
+  }
+}
+
 function createNestedObject(parts, initvalue) {
   if (typeof parts === "string") {
     parts = getPathArray(parts);
@@ -75,21 +88,7 @@ export default async function reducer(action) {
         const _parts = getPathArray(action.name);
         const _state = createNestedObject(_parts, action.initdate);
         store.runtime_state = { ...store.runtime_state, ..._state };
-        const keys = await store.offlineInstance.keys();
-        if (
-          store.offline &&
-          !store.offlineExcludes.includes(_parts[0]) &&
-          !keys.includes(_parts[0])
-        ) {
-          const excludes = filterExcludes(store.offlineExcludes, _parts[0]);
-          let valuefiltered = clone(_state[_parts[0]], true);
-          if (excludes.length > 0) {
-            excludes.forEach((path) => {
-              valuefiltered = deleteNestedKey(valuefiltered, path);
-            });
-          }
-          await store.offlineInstance.setItem(_parts[0], valuefiltered);
-        }
+        await endurance(store, _parts, store.runtime_state);
         break;
       case "modify":
         const names = getPathArray(action.name);
@@ -110,18 +109,7 @@ export default async function reducer(action) {
             }
           });
         }
-        if (store.offline) {
-          if (store.offline && !store.offlineExcludes.includes(names[0])) {
-            let valuefiltered = clone(temp_state[names[0]], true);
-            const excludes = filterExcludes(store.offlineExcludes, names[0]);
-            if (excludes.length > 0) {
-              excludes.forEach((path) => {
-                valuefiltered = deleteNestedKey(valuefiltered, path);
-              });
-            }
-            await store.offlineInstance.setItem(names[0], valuefiltered);
-          }
-        }
+        await endurance(store, names, temp_state);
         break;
       default: {
         throw new Error(`Unhandled action type: ${action.type}`);

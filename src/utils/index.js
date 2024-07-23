@@ -1,6 +1,6 @@
 import clone from "../clone";
 import { isPlainObject } from "lodash-es";
-import { _split, getPathArray } from "../reducer";
+import { _split, getPathArray, endurance } from "../reducer";
 
 export function get(
   name,
@@ -112,8 +112,15 @@ function getValue(propertyNames, store, options) {
         );
       }
     }
-    if (index === propertyNames.length - 1 && autocreated) {
+    if (
+      index === propertyNames.length - 1 &&
+      options.autoCreate &&
+      !nextValue
+    ) {
       nextValue = currentValue[propertyName] = options.defaultValue;
+      if (autocreated) {
+        endurance(store, propertyNames, store.runtime_state);
+      }
     }
     return nextValue;
   }, {});

@@ -88,7 +88,9 @@ export default async function reducer(action) {
         const _parts = getPathArray(action.name);
         const _state = createNestedObject(_parts, action.initdate);
         store.runtime_state = { ...store.runtime_state, ..._state };
-        await endurance(store, _parts, store.runtime_state);
+        const keys = await store.offlineInstance.keys();
+        if (!keys.includes(_parts[0]))
+          await endurance(store, _parts, store.runtime_state);
         break;
       case "modify":
         const names = getPathArray(action.name);

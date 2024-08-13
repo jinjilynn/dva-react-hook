@@ -1,6 +1,6 @@
 # dva-react-hook
 
-[![NPM](https://img.shields.io/badge/npm-v2.3.1-blue)](https://www.npmjs.com/package/dva-react-hook)
+[![NPM](https://img.shields.io/badge/npm-v2.3.2-blue)](https://www.npmjs.com/package/dva-react-hook)
 [![size](https://img.shields.io/badge/size-105KB-green)]()
 
 > React Hooks based, concise、lightweight framework, supporting offline storage, like blob,bufferArray and all primitive types.
@@ -206,11 +206,12 @@ import { Dynamic } from 'dva-react-hook';
 ou can use the useModel hook to inject a model state into a component.
 
 The parameter required by the useModel Hook is a string path.
-It returns a pair of values: a state and a function that updates it.
+It returns an array with three values: a state; a function that updates it; a function getting newest state
 
 1. The state represents the current model state defined by the path.
 
-2. The function returned updates the model state, not partly. You can also pass a second argument (optional) of type Object.
+2. The function returned updates the model state. You can also pass a second argument (optional) of type Object.
+3. Function can get the latest value of the path
 
 |   Property   |                                                        Description                                                         |      Type       |
 | :----------: | :------------------------------------------------------------------------------------------------------------------------: | :-------------: |

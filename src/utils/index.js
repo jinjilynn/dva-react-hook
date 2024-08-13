@@ -16,7 +16,11 @@ export function get(
   const names = getPathArray(name);
   const clonedState = getClonedState(names, store, options);
 
-  return [clonedState, createDispatchFn(names, store, clonedState)];
+  return [
+    clonedState,
+    createDispatchFn(names, store, clonedState),
+    () => getClonedState(names, store, options),
+  ];
 }
 
 function getClonedState(names, store, options) {

@@ -90,7 +90,7 @@ export default async function reducer(action) {
         store.runtime_state = { ...store.runtime_state, ..._state };
         const keys = await store.offlineInstance.keys();
         if (!keys.includes(_parts[0]))
-          await endurance(store, _parts, store.runtime_state);
+          endurance(store, _parts, store.runtime_state);
         break;
       case "modify":
         const names = getPathArray(action.name);
@@ -111,7 +111,7 @@ export default async function reducer(action) {
             }
           });
         }
-        await endurance(store, names, temp_state);
+        endurance(store, names, temp_state);
         break;
       default: {
         throw new Error(`Unhandled action type: ${action.type}`);

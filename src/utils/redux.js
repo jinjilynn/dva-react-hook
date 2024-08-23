@@ -1,18 +1,19 @@
-async function loop_dispatch(store) {
-  if (store.loopRunning) return;
-  store.loopRunning = true;
-  while (store.dispatch_queue.length > 0) {
-    const action = store.dispatch_queue.shift();
-    if (action) {
-      await store.REDUCER(action);
-    }
+import { nanoid } from "nanoid";
+
+async function loop_dispatch(store, uid) {
+  while (store.dispatch_queue[0].uid !== uid) {
+    await new Promise((resolve) => setTimeout(resolve, 0));
   }
-  store.loopRunning = false;
+  const { action } = store.dispatch_queue[0];
+  if (action) {
+    await store.REDUCER(action);
+    store.dispatch_queue.shift();
+  }
 }
 
-function dispatch(action) {
+async function dispatch(action) {
   const store = this;
-
+  const uid = nanoid();
   if (!store) {
     throw new Error(
       "strange!! there is no store in dispatch of utils, please issue it."
@@ -27,20 +28,9 @@ function dispatch(action) {
     throw new Error('Actions may not have an undefined "type" property.');
   }
 
-  store.dispatch_queue.push(action);
+  store.dispatch_queue.push({ uid, action });
 
-  if (!store.loopRunning) {
-    loop_dispatch(store);
-  }
-
-  return new Promise((resolve) => {
-    const interval = setInterval(() => {
-      if (!store.loopRunning) {
-        clearInterval(interval);
-        resolve(action);
-      }
-    }, 0);
-  });
+  await loop_dispatch(store, uid);
 }
 
 async function initfun($i) {
@@ -81,7 +71,6 @@ export default async function initStore(reducer, preloadedState, store) {
   }
   !store.REDUCER && (store.REDUCER = reducer.bind(store));
   !store.dispatch && (store.dispatch = dispatch.bind(store));
-  store.loopRunning = false;
   if (typeof preloadedState !== "undefined") {
     await initfun.call(store, preloadedState);
   }

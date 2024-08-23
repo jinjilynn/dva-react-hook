@@ -117,9 +117,12 @@ export default async function reducer(action) {
         throw new Error(`Unhandled action type: ${action.type}`);
       }
     }
+    const currentstate = clone(store.runtime_state, true);
     const subscribes = Object.values(store.changeSubscribes);
-    subscribes.forEach((fn) => {
-      fn(action, clone(store.runtime_state, true), store.runtime_state);
+    Promise.resolve().then(() => {
+      subscribes.forEach((fn) => {
+        fn(action, currentstate, store.runtime_state);
+      });
     });
   }
 }

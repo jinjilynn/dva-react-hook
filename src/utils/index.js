@@ -1,6 +1,7 @@
 import clone from "../clone";
 import { isPlainObject } from "lodash-es";
 import { _split, getPathArray, endurance } from "../reducer";
+import useDispatch from "../useDispatch";
 
 export function get(
   name,
@@ -58,17 +59,23 @@ export function execBack(modelbacks, callbacks, value, store) {
 
   const select = (name) => get(name, store);
   if (typeof callbacks === "string") {
-    executeCallback(modelbacks, callbacks, value, select);
+    executeCallback(modelbacks, callbacks, value, select, store);
   } else if (Array.isArray(callbacks)) {
     callbacks.forEach((callbackName) =>
-      executeCallback(modelbacks, callbackName, value, select)
+      executeCallback(modelbacks, callbackName, value, select, store)
     );
   }
 }
 
-function executeCallback(modelbacks, callbackName, value, select) {
+function executeCallback(modelbacks, callbackName, value, select, store) {
   if (typeof modelbacks[callbackName] === "function") {
-    modelbacks[callbackName]({ info: value, select });
+    modelbacks[callbackName]({
+      info: value,
+      select,
+      getDispatch: (action) => {
+        return useDispatch({ ...action, store });
+      },
+    });
   } else {
     console.error(`Callback ${callbackName} is not a function.`);
   }

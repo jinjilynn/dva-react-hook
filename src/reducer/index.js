@@ -1,6 +1,6 @@
 import { nanoid } from "nanoid";
 import clone from "../clone";
-import { isPlainObject } from "lodash-es";
+import { isPlainObject, get, isEqual } from "lodash-es";
 
 export const _split = "/";
 
@@ -94,7 +94,12 @@ export default async function reducer(action) {
         break;
       case "modify":
         const names = getPathArray(action.name);
-        const temp_state = set(store.runtime_state, names, action.data);
+        const pre_state = get(store.runtime_state, names.join("."));
+        const action_data = action.data;
+        if (isEqual(pre_state, action_data)) {
+          return;
+        }
+        const temp_state = set(store.runtime_state, names, action_data);
         if (!action.cancelUpdate) {
           const track = Object.values(store.REFRESH_CACHE);
           const parentTrack = `${names.join(_split)}${_split}`;

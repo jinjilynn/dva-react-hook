@@ -12,10 +12,12 @@ export function getPathArray(path) {
 }
 
 export async function endurance(store, names, temp_state) {
+  await new Promise((resolve) => setTimeout(resolve, 10));
   if (store.offline && !store.offlineExcludes.includes(names[0])) {
-    let valuefiltered = clone(temp_state[names[0]], true);
+    let valuefiltered = temp_state[names[0]];
     const excludes = filterExcludes(store.offlineExcludes, names[0]);
     if (excludes.length > 0) {
+      valuefiltered = clone(temp_state[names[0]], true);
       excludes.forEach((path) => {
         valuefiltered = deleteNestedKey(valuefiltered, path);
       });
@@ -122,12 +124,12 @@ export default async function reducer(action) {
         throw new Error(`Unhandled action type: ${action.type}`);
       }
     }
-    const currentstate = clone(store.runtime_state, true);
-    const subscribes = Object.values(store.changeSubscribes);
-    Promise.resolve().then(() => {
-      subscribes.forEach((fn) => {
-        fn(action, currentstate, store.runtime_state);
-      });
+    queueMicrotask(() => {
+      const currentstate = clone(store.runtime_state, true);
+      const subscribers = Object.values(store.changeSubscribes);
+      subscribers.forEach((fn) =>
+        fn(action, currentstate, store.runtime_state)
+      );
     });
   }
 }

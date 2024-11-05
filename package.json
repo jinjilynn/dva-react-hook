@@ -1,6 +1,6 @@
 {
   "name": "dva-react-hook",
-  "version": "2.3.6",
+  "version": "2.3.7",
   "description": "React Hooks based, concise、lightweight framework",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -21,7 +21,10 @@
     "email": "jinjilin@hotmail.com"
   },
   "license": "MIT",
-  "repository": "https://github.com/jinjilynn/dva-react-hook",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jinjilynn/dva-react-hook.git"
+  },
   "files": [
     "dist"
   ],

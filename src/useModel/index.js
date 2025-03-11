@@ -2,6 +2,7 @@ import React from "react";
 import { nanoid } from "nanoid";
 import { get } from "../utils";
 import { useNearestStore } from "../store";
+import { isEqual } from "lodash-es";
 
 export default function useModel(name, cancelupdate, _store, options) {
   const store = _store || useNearestStore();
@@ -21,5 +22,14 @@ export default function useModel(name, cancelupdate, _store, options) {
       !cancelupdate && delete store.REFRESH_CACHE[uid];
     };
   }, [name]);
-  return get(name, store, options);
+  const [value, setValue, getlatest] = get(name, store, options);
+  const valueref = React.useRef(value);
+  const memovalue = React.useMemo(() => {
+    const equal = isEqual(valueref.current, value);
+    if (!equal) {
+      valueref.current = value;
+    }
+    return valueref.current;
+  }, [value]);
+  return [memovalue, setValue, getlatest];
 }

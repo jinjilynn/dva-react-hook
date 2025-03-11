@@ -105,8 +105,7 @@ function getValue(propertyNames, store, options) {
   }
   let autocreated = false;
   const r = propertyNames.reduce((accumulator, propertyName, index) => {
-    const currentValue = index === 0 ? store.runtime_state : accumulator;
-    let nextValue = currentValue[propertyName];
+    let nextValue = accumulator[propertyName];
     if (
       propertyNames.length > 1 &&
       index < propertyNames.length - 1 &&
@@ -114,7 +113,7 @@ function getValue(propertyNames, store, options) {
     ) {
       if (options.autoCreate) {
         autocreated = true;
-        nextValue = currentValue[propertyName] = {};
+        nextValue = accumulator[propertyName] = {};
       } else {
         throw new Error(
           `${propertyName} is not an object, so the property['${
@@ -128,12 +127,12 @@ function getValue(propertyNames, store, options) {
       options.autoCreate &&
       !nextValue
     ) {
-      nextValue = currentValue[propertyName] = options.defaultValue;
+      nextValue = accumulator[propertyName] = options.defaultValue;
       if (autocreated) {
         endurance(store, propertyNames, store.runtime_state);
       }
     }
     return nextValue;
-  }, {});
+  }, store.runtime_state);
   return clone(r);
 }

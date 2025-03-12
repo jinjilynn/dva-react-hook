@@ -88,7 +88,7 @@ export default async function reducer(action) {
     switch (action.type) {
       case "add":
         const _parts = getPathArray(action.name);
-        const _state = createNestedObject(_parts, action.initdate);
+        const _state = createNestedObject(_parts, clone(action.initdate));
         store.runtime_state = { ...store.runtime_state, ..._state };
         const keys = await store.offlineInstance.keys();
         if (!keys.includes(_parts[0]))
@@ -97,7 +97,7 @@ export default async function reducer(action) {
       case "modify":
         const names = getPathArray(action.name);
         const pre_state = get(store.runtime_state, names.join("."));
-        const action_data = action.data;
+        const action_data = clone(action.data);
         if (isEqual(pre_state, action_data)) {
           return;
         }

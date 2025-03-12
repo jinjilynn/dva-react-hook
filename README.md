@@ -1,9 +1,11 @@
 # dva-react-hook
 
-[![NPM](https://img.shields.io/badge/npm-v2.4.0-blue)](https://www.npmjs.com/package/dva-react-hook)
+[![NPM](https://img.shields.io/badge/npm-v2.5.0-blue)](https://www.npmjs.com/package/dva-react-hook)
 [![size](https://img.shields.io/badge/size-115KB-green)]()
 
 > React Hooks based, concise、lightweight framework, supporting offline storage, like blob,bufferArray and all primitive types.
+
+### 2.4.0 version has been forbidden to use, because of enmergency bug.
 
 ## Table of Contents
 

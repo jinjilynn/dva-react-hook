@@ -14,6 +14,7 @@ export default function useModel(name, cancelupdate, _store, options) {
   if (typeof name !== "string") {
     throw new Error("useModel's argument must be a string");
   }
+  const valueref = React.useRef();
   const setState = React.useState(nanoid())[1];
   React.useEffect(() => {
     const uid = nanoid();
@@ -21,15 +22,11 @@ export default function useModel(name, cancelupdate, _store, options) {
     return () => {
       !cancelupdate && delete store.REFRESH_CACHE[uid];
     };
-  }, [name]);
+  }, [name, store, cancelupdate]);
   const [value, setValue, getlatest] = get(name, store, options);
-  const valueref = React.useRef(value);
-  const memovalue = React.useMemo(() => {
-    const equal = isEqual(valueref.current, value);
-    if (!equal) {
-      valueref.current = value;
-    }
-    return valueref.current;
-  }, [value]);
-  return [memovalue, setValue, getlatest];
+  const equal = isEqual(valueref.current, value);
+  if (!equal) {
+    valueref.current = value;
+  }
+  return [valueref.current, setValue, getlatest];
 }

@@ -4,7 +4,7 @@ import {
   isElement,
   isFunction,
   isDate,
-} from "lodash-es";
+} from 'lodash-es';
 
 function cloneTypedArray(typedArray) {
   return typedArray.constructor.from(typedArray);
@@ -12,6 +12,19 @@ function cloneTypedArray(typedArray) {
 
 function isBlob(object) {
   return object instanceof Blob;
+}
+
+function isCopyMeaningless(obj) {
+  return (
+    obj instanceof Worker ||
+    obj instanceof Promise ||
+    obj instanceof RegExp ||
+    obj instanceof Node ||
+    obj instanceof Event ||
+    typeof obj === 'symbol' ||
+    obj instanceof WeakMap ||
+    obj instanceof WeakSet
+  );
 }
 
 export default function clone(obj, offline = false) {
@@ -30,6 +43,9 @@ export default function clone(obj, offline = false) {
     }
     if (isBlob(value)) {
       return value;
+    }
+    if (isCopyMeaningless(value)) {
+      return offline ? null : value;
     }
   });
 }

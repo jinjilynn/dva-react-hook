@@ -1,6 +1,6 @@
 # dva-react-hook
 
-[![NPM](https://img.shields.io/badge/npm-v2.5.0-blue)](https://www.npmjs.com/package/dva-react-hook)
+[![NPM](https://img.shields.io/badge/npm-v2.5.1-blue)](https://www.npmjs.com/package/dva-react-hook)
 [![size](https://img.shields.io/badge/size-115KB-green)]()
 
 > React Hooks based, concise、lightweight framework, supporting offline storage, like blob,bufferArray and all primitive types.
@@ -36,7 +36,7 @@ npm install --save dva-react-hook
 ## In Node.js
 
 ```javascript
-var dvaHook = require("dva-react-hook");
+var dvaHook = require('dva-react-hook');
 ```
 
 ## Quick Start
@@ -45,12 +45,12 @@ var dvaHook = require("dva-react-hook");
 //
 // Bootstrap your app
 //
-import React from "react";
-import Provider, { useModel } from "dva-react-hook";
+import React from 'react';
+import Provider, { useModel } from 'dva-react-hook';
 
 function App() {
-  const name = useModel("name")[0];
-  const [count, setCount] = useModel("apples/count");
+  const name = useModel('name')[0];
+  const [count, setCount] = useModel('apples/count');
 
   const eat = () => {
     setCount(count - 1);
@@ -58,7 +58,7 @@ function App() {
   return (
     <div>
       <span>
-        {" "}
+        {' '}
         {name} has {count} apples
       </span>
       <button onClick={eat}>Eat One</button>
@@ -67,9 +67,9 @@ function App() {
 }
 
 const initState = {
-  name: "Lynn",
+  name: 'Lynn',
   apples: {
-    state: "raw",
+    state: 'raw',
     count: 4,
   },
 };
@@ -78,7 +78,7 @@ ReactDOM.render(
   <Provider {...initState}>
     <App />
   </Provider>,
-  document.getElementById("root")
+  document.getElementById('root')
 );
 ```
 
@@ -267,7 +267,7 @@ useDispatch returns the function you registered in effects. The only argument to
 The function returned by useDispatch is wrapped by an async function and is also injected with an object parameter, so you can get the state of the model, the function updates it, and a selector which can select other models' state and set other models' state.
 
 ```javascript
-const loginaction = useDispatch({ type: "login/login", otherproperties: "" });
+const loginaction = useDispatch({ type: 'login/login', otherproperties: '' });
 //otherproperty is optional, if you set some other properties, you can get them in the injected argument
 
 //so your code in model maybe like this   async login({ name,pass },{ state, setState, select, otherproperties }){}
@@ -327,7 +327,7 @@ const App = (props)=>{
 ```
 
 ```javascript
-import { useAdd } from "dva-react-hook";
+import { useAdd } from 'dva-react-hook';
 
 useAdd(name, initdate, once);
 // name is the model's name

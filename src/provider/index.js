@@ -86,7 +86,7 @@ function Provider({
         delete store[item];
       });
       noCached === true && delete window[`dva_react_hook_store_${_key}`];
-      localForage.dropInstance({ name: uniqueKey });
+      localForage.dropInstance({ name: _key });
       setCombinedWithStore({ com: null, store: null });
     };
   }, [uniqueKey]);

@@ -132,9 +132,9 @@ function getValue(propertyNames, store, options) {
       if (options.autoCreate && !nextValue) {
         nextValue = accumulator[propertyName] = options.defaultValue;
       }
-      if (options.autoCreate && !isSameType(nextValue, options.defaultValue)) {
+      if (options.resetField && !isSameType(nextValue, options.resetValue)) {
         autocreated = true;
-        nextValue = accumulator[propertyName] = options.defaultValue;
+        nextValue = accumulator[propertyName] = options.resetValue;
       }
       if (autocreated) {
         endurance(store, propertyNames, store.runtime_state);

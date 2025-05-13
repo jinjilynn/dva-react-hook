@@ -3,6 +3,12 @@ import { isPlainObject } from "lodash-es";
 import { _split, getPathArray, endurance } from "../reducer";
 import useDispatch from "../useDispatch";
 
+function isSameType(a, b) {
+  return (
+    Object.prototype.toString.call(a) === Object.prototype.toString.call(b)
+  );
+}
+
 export function get(
   name,
   store,
@@ -122,17 +128,19 @@ function getValue(propertyNames, store, options) {
         );
       }
     }
-    if (
-      index === propertyNames.length - 1 &&
-      options.autoCreate &&
-      !nextValue
-    ) {
-      nextValue = accumulator[propertyName] = options.defaultValue;
+    if (index === propertyNames.length - 1) {
+      if (options.autoCreate && !nextValue) {
+        nextValue = accumulator[propertyName] = options.defaultValue;
+      }
+      if (options.autoCreate && !isSameType(nextValue, options.defaultValue)) {
+        autocreated = true;
+        nextValue = accumulator[propertyName] = options.defaultValue;
+      }
       if (autocreated) {
         endurance(store, propertyNames, store.runtime_state);
       }
+      return nextValue;
     }
-    return nextValue;
   }, store.runtime_state);
   return clone(r);
 }

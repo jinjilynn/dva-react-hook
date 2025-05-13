@@ -1,6 +1,6 @@
 # dva-react-hook
 
-[![NPM](https://img.shields.io/badge/npm-v2.5.2-blue)](https://www.npmjs.com/package/dva-react-hook)
+[![NPM](https://img.shields.io/badge/npm-v2.5.3-blue)](https://www.npmjs.com/package/dva-react-hook)
 [![size](https://img.shields.io/badge/size-115KB-green)]()
 
 > React Hooks based, concise、lightweight framework, supporting offline storage, like blob,bufferArray and all primitive types.
@@ -193,12 +193,6 @@ import { Dynamic } from 'dva-react-hook';
 
       }
     }
-    //optional
-    callbacks:{
-      'some-callback-name': (value) => {
-        // do something with value
-      }
-    }
 }
 
 ```
@@ -215,49 +209,45 @@ It returns an array with three values: a state; a function that updates it; a fu
 2. The function returned updates the model state. You can also pass a second argument (optional) of type Object.
 3. Function can get the latest value of the path
 
-|   Property   |                                                        Description                                                         |      Type       |
-| :----------: | :------------------------------------------------------------------------------------------------------------------------: | :-------------: |
-| cancelUpdate | If the value is true, the corresponding component's update will not be triggered, otherwise the update will be triggered.  |     boolean     |
-|  callbacks   | After the function updates the model state is executed, The specified callbacks defined in the model will also be executed | string \| Array |
-|   options    |                                   default { autoCreate: false, defaultValue:undefined }                                    |     Object      |
+|   Property   |                                                        Description                                                        |  Type   |
+| :----------: | :-----------------------------------------------------------------------------------------------------------------------: | :-----: |
+| cancelUpdate | If the value is true, the corresponding component's update will not be triggered, otherwise the update will be triggered. | boolean |
+|   options    |                                   default { autoCreate: false, defaultValue:undefined }                                   | Object  |
 
 ```javascript
-import React from 'react';
-import Provider, { useDispatch, useModel } from 'dva-react-hook';
+import React from "react";
+import Provider, { useDispatch, useModel } from "dva-react-hook";
 
-function App(){
-  const eat = useDispatch({ type: 'apple/eat' });
-  const apple = useModel('apple')[0];
-  function eatOne(){
+function App() {
+  const eat = useDispatch({ type: "apple/eat" });
+  const apple = useModel("apple")[0];
+  function eatOne() {
     eat(1);
   }
-  return <div>
+  return (
+    <div>
       <span>there are {apple.count} apples</span>
       <button onClick={eatOne}>eat one apple</button>
-  </div>
+    </div>
+  );
 }
 
 const apple_model = {
-  name: 'apple',
+  name: "apple",
   init: {
-    count:8
+    count: 8,
   },
   effects: {
-    eat: (num, {state, setState }) => {
-      setState({count: satae.count - num}, { cancelUpdate: true, callbacks: 'show-left-count' });
-    }
+    eat: (num, { state, setState }) => {
+      setState({ count: satae.count - num }, { cancelUpdate: true });
+    },
   },
-  callbacks: {
-    'show-left-count': (v){
-     alert(`the left count is ${v.count}`);
-    }
-  }
-}
+};
 ReactDOM.render(
-  <Provider  models={[apple_model]}>
+  <Provider models={[apple_model]}>
     <App />
   </Provider>,
-  document.getElementById('root'),
+  document.getElementById("root")
 );
 ```
 

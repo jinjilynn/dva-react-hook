@@ -139,8 +139,8 @@ function getValue(propertyNames, store, options) {
       if (autocreated) {
         endurance(store, propertyNames, store.runtime_state);
       }
-      return nextValue;
     }
+    return nextValue;
   }, store.runtime_state);
   return clone(r);
 }

@@ -2,7 +2,7 @@ import React from "react";
 import { nanoid } from "nanoid";
 import { useNearestStore } from "../store";
 
-export default function useChange(callback, _store) {
+export default function useChange(callback, _store, dependencies = []) {
   const store = _store || useNearestStore();
   if (!store) {
     throw new Error(
@@ -18,5 +18,5 @@ export default function useChange(callback, _store) {
     return () => {
       delete store.changeSubscribes[uid];
     };
-  }, [store]);
+  }, [store, ...dependencies]);
 }

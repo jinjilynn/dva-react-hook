@@ -70,6 +70,7 @@ export default function useDispatch(action) {
       getDispatch: (action) => {
         return useDispatch({ ...action, store });
       },
+      offlineInstance: store.offlineInstance,
     });
   };
   return effectwrapped;

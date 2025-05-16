@@ -85,6 +85,7 @@ export default async function reducer(action) {
     throw new Error("strange!! there is no store in reducer, please issue it.");
   }
   if (action.inner === store.inner) {
+    const previousstate = clone(store.runtime_state, true);
     switch (action.type) {
       case "add":
         const _parts = getPathArray(action.name);
@@ -127,9 +128,7 @@ export default async function reducer(action) {
     queueMicrotask(() => {
       const currentstate = clone(store.runtime_state, true);
       const subscribers = Object.values(store.changeSubscribes);
-      subscribers.forEach((fn) =>
-        fn(action, currentstate, store.runtime_state)
-      );
+      subscribers.forEach((fn) => fn(action, currentstate, previousstate));
     });
   }
 }

@@ -79,6 +79,18 @@ function set(obj, path, value) {
   return obj;
 }
 
+export function checkPrefixRelation(prearray, currentarray) {
+  if (prearray.length > currentarray.length) {
+    return false;
+  }
+  for (let i = 0; i < prearray.length; i++) {
+    if (prearray[i] !== currentarray[i]) {
+      return false;
+    }
+  }
+  return true;
+}
+
 export default async function reducer(action) {
   const store = this;
   if (!store) {
@@ -86,17 +98,16 @@ export default async function reducer(action) {
   }
   if (action.inner === store.inner) {
     const previousstate = clone(store.runtime_state, true);
+    const names = getPathArray(action.name);
     switch (action.type) {
       case "add":
-        const _parts = getPathArray(action.name);
-        const _state = createNestedObject(_parts, clone(action.initdate));
+        const _state = createNestedObject(names, clone(action.initdate));
         store.runtime_state = { ...store.runtime_state, ..._state };
         const keys = await store.offlineInstance.keys();
-        if (!keys.includes(_parts[0]))
-          endurance(store, _parts, store.runtime_state);
+        if (!keys.includes(names[0]))
+          endurance(store, names, store.runtime_state);
         break;
       case "modify":
-        const names = getPathArray(action.name);
         const pre_state = get(store.runtime_state, names.join("."));
         const action_data = clone(action.data);
         if (isEqual(pre_state, action_data)) {
@@ -129,6 +140,37 @@ export default async function reducer(action) {
       const currentstate = clone(store.runtime_state, true);
       const subscribers = Object.values(store.changeSubscribes);
       subscribers.forEach((fn) => fn(action, currentstate, previousstate));
+    });
+    queueMicrotask(() => {
+      const currentstate = clone(store.runtime_state, true);
+      for (const key in store.observerSubscribes) {
+        const paths = getPathArray(key);
+        const namelength = names.length;
+        const pathlength = paths.length;
+        if (namelength === pathlength) {
+          if (isEqual(names, paths)) {
+            const prevalue = get(previousstate, paths.join("."));
+            const currentvalue = get(currentstate, paths.join("."));
+            store.observerSubscribes[key]({ prevalue, currentvalue });
+          }
+        }
+        if (namelength > pathlength) {
+          if (checkPrefixRelation(paths, names)) {
+            const prevalue = get(previousstate, paths.join("."));
+            const currentvalue = get(currentstate, paths.join("."));
+            store.observerSubscribes[key]({ prevalue, currentvalue });
+          }
+        }
+        if (namelength < pathlength) {
+          if (checkPrefixRelation(names, paths)) {
+            const prevalue = get(previousstate, paths.join("."));
+            const currentvalue = get(currentstate, paths.join("."));
+            if (!isEqual(prevalue, currentvalue)) {
+              store.observerSubscribes[key]({ prevalue, currentvalue });
+            }
+          }
+        }
+      }
     });
   }
 }

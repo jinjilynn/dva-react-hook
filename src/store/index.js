@@ -19,6 +19,7 @@ function generateStore(key) {
     let offlineInstance;
     let offlineExcludes = [];
     const changeSubscribes = {};
+    const observerSubscribes = {};
     window[key] = {
       offline,
       offlineInstance,
@@ -32,6 +33,7 @@ function generateStore(key) {
       runtime_state,
       dispatch_queue,
       changeSubscribes,
+      observerSubscribes,
     };
   }
   return window[key];

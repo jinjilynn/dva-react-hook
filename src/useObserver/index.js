@@ -1,8 +1,7 @@
 import React from "react";
-import { nanoid } from "nanoid";
 import { useNearestStore } from "../store";
 
-export default function useChange(callback, dependencies = [], _store) {
+export default function useObserver(path, callback, dependencies = [], _store) {
   const store = _store || useNearestStore();
   if (!store) {
     throw new Error(
@@ -13,10 +12,9 @@ export default function useChange(callback, dependencies = [], _store) {
     throw new Error("useChange's argument must be a function");
   }
   React.useEffect(() => {
-    const uid = nanoid();
-    store.changeSubscribes[uid] = callback;
+    store.observerSubscribes[path] = callback;
     return () => {
-      delete store.changeSubscribes[uid];
+      delete store.observerSubscribes[path];
     };
-  }, [store, ...dependencies]);
+  }, [path, store, ...dependencies]);
 }

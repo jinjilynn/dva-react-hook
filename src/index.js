@@ -10,6 +10,7 @@ export { default as useChange } from "./useChange";
 export { default as useObserver } from "./useObserver";
 export { useNearestStore } from "./store";
 export { checkPrefixRelation, getPathArray } from "./reducer";
+export { default as clone } from "./clone";
 export { get };
 
 export default Provider;

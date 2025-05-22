@@ -4,11 +4,17 @@ import { isPlainObject, get, isEqual } from "lodash-es";
 
 export const _split = "/";
 
+const pathCache = new Map();
 export function getPathArray(path) {
+  if (pathCache.has(path)) {
+    return pathCache.get(path);
+  }
   if (path.endsWith(_split)) {
     path = path.slice(0, -1);
   }
-  return path.split(_split);
+  const result = path.split(_split);
+  pathCache.set(path, result);
+  return result;
 }
 
 export async function endurance(store, names, temp_state) {
@@ -68,14 +74,16 @@ function deleteNestedKey(obj, parts) {
 
 function set(obj, path, value) {
   const pathParts = Array.isArray(path) ? path : getPathArray(path);
+  const len = pathParts.length;
   let current = obj;
-  for (let i = 0; i < pathParts.length - 1; i++) {
-    if (!isPlainObject(current[pathParts[i]])) {
-      current[pathParts[i]] = {};
+  for (let i = 0; i < len - 1; i++) {
+    const part = pathParts[i];
+    if (!isPlainObject(current[part])) {
+      current[part] = {};
     }
-    current = current[pathParts[i]];
+    current = current[part];
   }
-  current[pathParts[pathParts.length - 1]] = value;
+  current[pathParts[len - 1]] = value;
   return obj;
 }
 
@@ -97,21 +105,39 @@ export default async function reducer(action) {
     throw new Error("strange!! there is no store in reducer, please issue it.");
   }
   if (action.inner === store.inner) {
-    const previousstate = clone(store.runtime_state, true);
-    const names = getPathArray(action.name);
+    const debounceTimers = store.debounceTimers;
+    const currentStateMap = store.currentStateMap;
+    const previousStateMap = store.previousStateMap;
+    const namestring = action.name;
+    const names = getPathArray(namestring);
+    if (!debounceTimers.has(namestring)) {
+      const prestorestate = clone(store.runtime_state);
+      const pre_state = get(prestorestate, names.join("."));
+      previousStateMap.set(namestring, {
+        storestate: prestorestate,
+        prevalue: pre_state,
+      });
+    }
     switch (action.type) {
       case "add":
-        const _state = createNestedObject(names, clone(action.initdate));
+        const init_data = clone(action.initdate);
+        if (previousStateMap.has(namestring)) {
+          currentStateMap.set(namestring, init_data);
+        }
+        const _state = createNestedObject(names, init_data);
         store.runtime_state = { ...store.runtime_state, ..._state };
         const keys = await store.offlineInstance.keys();
         if (!keys.includes(names[0]))
           endurance(store, names, store.runtime_state);
         break;
       case "modify":
-        const pre_state = get(store.runtime_state, names.join("."));
+        const prestate = get(store.runtime_state, names.join("."));
         const action_data = clone(action.data);
-        if (isEqual(pre_state, action_data)) {
+        if (isEqual(prestate, action_data)) {
           return;
+        }
+        if (previousStateMap.has(namestring)) {
+          currentStateMap.set(namestring, action_data);
         }
         const temp_state = set(store.runtime_state, names, action_data);
         if (!action.cancelUpdate) {
@@ -136,41 +162,45 @@ export default async function reducer(action) {
         throw new Error(`Unhandled action type: ${action.type}`);
       }
     }
-    queueMicrotask(() => {
-      const currentstate = clone(store.runtime_state, true);
-      const subscribers = Object.values(store.changeSubscribes);
-      subscribers.forEach((fn) => fn(action, currentstate, previousstate));
-    });
-    queueMicrotask(() => {
-      const currentstate = clone(store.runtime_state, true);
-      for (const key in store.observerSubscribes) {
-        const paths = getPathArray(key);
-        const namelength = names.length;
-        const pathlength = paths.length;
-        if (namelength === pathlength) {
-          if (isEqual(names, paths)) {
-            const prevalue = get(previousstate, paths.join("."));
-            const currentvalue = get(currentstate, paths.join("."));
-            store.observerSubscribes[key]({ prevalue, currentvalue });
+
+    if (debounceTimers.has(namestring)) {
+      clearTimeout(debounceTimers.get(namestring));
+    }
+    debounceTimers.set(
+      namestring,
+      setTimeout(() => {
+        const previousstate = previousStateMap.get(namestring);
+        const currentstate = currentStateMap.get(namestring);
+        const subscribers = Object.values(store.changeSubscribes);
+        subscribers.forEach((fn) =>
+          fn(namestring, currentstate, previousstate)
+        );
+        for (const key in store.observerSubscribes) {
+          const paths = getPathArray(key);
+          const namelength = names.length;
+          const pathlength = paths.length;
+          if (namelength === pathlength) {
+            if (isEqual(names, paths)) {
+              store.observerSubscribes[key](currentstate, previousstate);
+            }
           }
-        }
-        if (namelength > pathlength) {
-          if (checkPrefixRelation(paths, names)) {
-            const prevalue = get(previousstate, paths.join("."));
-            const currentvalue = get(currentstate, paths.join("."));
-            store.observerSubscribes[key]({ prevalue, currentvalue });
+          if (namelength > pathlength) {
+            if (checkPrefixRelation(paths, names)) {
+              store.observerSubscribes[key](currentstate, previousstate);
+            }
           }
-        }
-        if (namelength < pathlength) {
-          if (checkPrefixRelation(names, paths)) {
-            const prevalue = get(previousstate, paths.join("."));
-            const currentvalue = get(currentstate, paths.join("."));
-            if (!isEqual(prevalue, currentvalue)) {
-              store.observerSubscribes[key]({ prevalue, currentvalue });
+          if (namelength < pathlength) {
+            if (checkPrefixRelation(names, paths)) {
+              if (!isEqual(previousstate.prevalue, currentstate)) {
+                store.observerSubscribes[key](currentstate, previousstate);
+              }
             }
           }
         }
-      }
-    });
+        debounceTimers.delete(namestring);
+        previousStateMap.delete(namestring);
+        currentStateMap.delete(namestring);
+      }, store.changedelay)
+    );
   }
 }

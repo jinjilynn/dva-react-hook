@@ -20,6 +20,9 @@ function generateStore(key) {
     let offlineExcludes = [];
     const changeSubscribes = {};
     const observerSubscribes = {};
+    const debounceTimers = new Map();
+    const previousStateMap = new Map();
+    const currentStateMap = new Map();
     window[key] = {
       offline,
       offlineInstance,
@@ -34,6 +37,9 @@ function generateStore(key) {
       dispatch_queue,
       changeSubscribes,
       observerSubscribes,
+      debounceTimers,
+      previousStateMap,
+      currentStateMap,
     };
   }
   return window[key];

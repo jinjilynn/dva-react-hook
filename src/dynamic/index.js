@@ -20,7 +20,7 @@ export async function registeModel(_, store) {
   if (!store.MODELS[_.name]) {
     store.MODELS[_.name] = _;
   }
-  if (!store.runtime_state.hasOwnProperty(_.name)) {
+  if (!store.runtime_state.hasOwnProperty(_.name) || !!store.noCached) {
     let data = {};
     if (_.hasOwnProperty("init")) {
       data = _.init;

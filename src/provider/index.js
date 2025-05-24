@@ -2,26 +2,23 @@ import React from "react";
 import * as localForage from "localforage";
 import { nanoid } from "nanoid";
 import { mergeWith } from "lodash-es";
-import store, { setStoreByKey, getStoreByKey } from "../store";
+import store, { generateStore, getStoreByKey, identifier } from "../store";
 import reducer from "../reducer";
 import initStore from "../utils/redux";
 import { registeModel } from "../dynamic";
 
-function generateContext(_key, _uid, nested) {
+function generateContext(_key, _com_key) {
   const Context = React.createContext();
   let _store = getStoreByKey(_key);
   if (!_store) {
-    _store = setStoreByKey(_key);
+    _store = generateStore();
   }
-  if (nested === true) {
-    store[`${_key}_${_uid}`] = Context;
-  }
+  store[_com_key] = Context;
   return [_store, Context];
 }
 
 function Provider({
   uniqueKey,
-  nested = true,
   models,
   offlineConfig = {},
   noCached,
@@ -33,13 +30,11 @@ function Provider({
     com: null,
     store: null,
   });
-  const uid_cache = React.useRef([]);
   React.useEffect(() => {
     const _new_uid = nanoid();
     const _key = (uniqueKey && uniqueKey.toString()) || "default";
     const _com_key = `${_key}_${_new_uid}`;
-    uid_cache.current.push(_com_key);
-    const [_store, _Context] = generateContext(_key, _new_uid, nested);
+    const [_store, _Context] = generateContext(_key, _com_key);
     _store.offline = offlineConfig.offline === true;
     _store.offlineExcludes = offlineConfig.excludes || [];
     const customizer = offlineConfig.customizer;
@@ -65,6 +60,7 @@ function Provider({
             customizer
           );
           _store.runtime_state[key] = _v;
+          window[`${identifier}${_key}`] = _store;
         })
         .then(() => {
           setCombinedWithStore({ com: _Context.Provider, store: _store });
@@ -75,6 +71,7 @@ function Provider({
     };
     const notrecover = async () => {
       await _init();
+      window[`${identifier}${_key}`] = _store;
       setCombinedWithStore({ com: _Context.Provider, store: _store });
     };
     if (offlineConfig.autoRecover === true) {
@@ -83,10 +80,8 @@ function Provider({
       notrecover();
     }
     return () => {
-      uid_cache.current.forEach((item) => {
-        delete store[item];
-      });
-      noCached === true && delete window[`dva_react_hook_store_${_key}`];
+      delete store[_com_key];
+      noCached === true && delete window[`${identifier}${_key}`];
       localForage.dropInstance({ name: _key });
       setCombinedWithStore({ com: null, store: null });
     };

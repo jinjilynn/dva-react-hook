@@ -110,17 +110,26 @@ export default async function reducer(action) {
     const previousStateMap = store.previousStateMap;
     const namestring = action.name;
     const names = getPathArray(namestring);
-    if (!debounceTimers.has(namestring)) {
-      const prestorestate = clone(store.runtime_state);
-      const pre_state = get(prestorestate, names.join("."));
-      previousStateMap.set(namestring, {
-        storestate: prestorestate,
-        prevalue: pre_state,
-      });
+    const excludesarray = store.offlineExcludes;
+    const isexcluded = excludesarray.some((path) =>
+      checkPrefixRelation(getPathArray(path), names)
+    );
+    const prestate = get(store.runtime_state, names.join("."));
+    let onchangerun = false;
+    if (!debounceTimers.has(namestring) && !isexcluded) {
+      if (!isEqual(prestate, action.data)) {
+        const prestorestate = clone(store.runtime_state);
+        const pre_state = get(prestorestate, names.join("."));
+        previousStateMap.set(namestring, {
+          storestate: prestorestate,
+          prevalue: pre_state,
+        });
+        onchangerun = true;
+      }
     }
     switch (action.type) {
       case "add":
-        const init_data = clone(action.initdate);
+        const init_data = clone(action.data);
         if (previousStateMap.has(namestring)) {
           currentStateMap.set(namestring, init_data);
         }
@@ -131,11 +140,10 @@ export default async function reducer(action) {
           endurance(store, names, store.runtime_state);
         break;
       case "modify":
-        const prestate = get(store.runtime_state, names.join("."));
-        const action_data = clone(action.data);
-        if (isEqual(prestate, action_data)) {
+        if (isEqual(prestate, action.data)) {
           return;
         }
+        const action_data = clone(action.data);
         if (previousStateMap.has(namestring)) {
           currentStateMap.set(namestring, action_data);
         }
@@ -162,7 +170,7 @@ export default async function reducer(action) {
         throw new Error(`Unhandled action type: ${action.type}`);
       }
     }
-
+    if (!onchangerun) return;
     if (debounceTimers.has(namestring)) {
       clearTimeout(debounceTimers.get(namestring));
     }

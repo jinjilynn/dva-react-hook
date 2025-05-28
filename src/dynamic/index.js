@@ -31,7 +31,7 @@ export async function registeModel(_, store) {
     await store.dispatch({
       type: "add",
       name: _.name,
-      initdate: data,
+      data,
       inner: store.inner,
     });
   }

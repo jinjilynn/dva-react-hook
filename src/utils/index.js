@@ -15,6 +15,7 @@ export function get(
   options = {
     autoCreate: false,
     defaultValue: undefined,
+    referenced: false,
   }
 ) {
   validateStore(store);
@@ -25,7 +26,7 @@ export function get(
 
   return [
     clonedState,
-    createDispatchFn(names, store, clonedState),
+    createDispatchFn(names, store, clonedState, options.referenced),
     () => getClonedState(names, store, options),
   ];
 }
@@ -35,7 +36,7 @@ function getClonedState(names, store, options) {
   return state;
 }
 
-function createDispatchFn(names, store, clonedState) {
+function createDispatchFn(names, store, clonedState, referenced) {
   return async (value, { cancelUpdate, callbacks } = {}) => {
     const result = await store.dispatch({
       type: "modify",
@@ -43,6 +44,7 @@ function createDispatchFn(names, store, clonedState) {
       data: value,
       inner: store.inner,
       cancelUpdate,
+      referenced,
     });
     if (callbacks && store.MODELS[names[0]]) {
       const model = store.MODELS[names[0]];
@@ -89,7 +91,7 @@ function executeCallback(modelbacks, callbackName, value, select, store) {
 
 function validateStore(store) {
   if (!store) {
-    throw new Error("strange!! there is no store in utils, please issue it.");
+    throw new Error("odd!! there is no store in utils, please issue it.");
   }
 }
 
@@ -142,5 +144,5 @@ function getValue(propertyNames, store, options) {
     }
     return nextValue;
   }, store.runtime_state);
-  return clone(r);
+  return options.referenced ? r : clone(r);
 }

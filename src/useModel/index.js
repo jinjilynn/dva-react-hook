@@ -7,9 +7,7 @@ import { isEqual } from "lodash-es";
 export default function useModel(name, cancelupdate, _store, options) {
   const store = _store || useNearestStore();
   if (!store) {
-    throw new Error(
-      "strange!! there is no store in useModel, please issue it."
-    );
+    throw new Error("odd!! there is no store in useModel, please issue it.");
   }
   if (typeof name !== "string") {
     throw new Error("useModel's argument must be a string");

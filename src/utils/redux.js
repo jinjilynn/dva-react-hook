@@ -16,7 +16,7 @@ async function dispatch(action) {
   const uid = nanoid();
   if (!store) {
     throw new Error(
-      "strange!! there is no store in dispatch of utils, please issue it."
+      "odd!! there is no store in dispatch of utils, please issue it."
     );
   }
 

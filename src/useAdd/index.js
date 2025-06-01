@@ -5,7 +5,7 @@ import { useNearestStore } from "../store";
 export default function useAdd(name, initdate, once) {
   const store = useNearestStore();
   if (!store) {
-    throw new Error("strange!! there is no store in useAdd, please issue it.");
+    throw new Error("odd!! there is no store in useAdd, please issue it.");
   }
   if (typeof name !== "string") {
     throw new Error("name must be a string");

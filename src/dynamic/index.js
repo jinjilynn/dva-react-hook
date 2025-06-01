@@ -15,7 +15,7 @@ export async function registeModel(_, store) {
     throw new Error("name can not be empty");
   }
   if (!store) {
-    throw new Error("strange!! there is no store, please issue it.");
+    throw new Error("odd!! there is no store, please issue it.");
   }
   if (!store.MODELS[_.name]) {
     store.MODELS[_.name] = _;
@@ -41,7 +41,7 @@ function Dynamic(props) {
   const store = useNearestStore();
 
   if (!store) {
-    throw new Error("strange!! there is no store in dynamic, please issue it.");
+    throw new Error("odd!! there is no store in dynamic, please issue it.");
   }
 
   const [state, setMount] = React.useState({ loaded: false });

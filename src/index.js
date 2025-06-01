@@ -8,7 +8,9 @@ export { default as useDispatch } from "./useDispatch";
 export { default as useModel } from "./useModel";
 export { default as useChange } from "./useChange";
 export { default as useObserver } from "./useObserver";
+export { default as useReference } from "./useReference";
 export { useNearestStore } from "./store";
+
 export { checkPrefixRelation, getPathArray } from "./reducer";
 export { default as clone } from "./clone";
 export { get };

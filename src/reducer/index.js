@@ -102,7 +102,7 @@ export function checkPrefixRelation(prearray, currentarray) {
 export default async function reducer(action) {
   const store = this;
   if (!store) {
-    throw new Error("strange!! there is no store in reducer, please issue it.");
+    throw new Error("odd!! there is no store in reducer, please issue it.");
   }
   if (action.inner === store.inner) {
     const debounceTimers = store.debounceTimers;
@@ -143,7 +143,9 @@ export default async function reducer(action) {
         if (isEqual(prestate, action.data)) {
           return;
         }
-        const action_data = clone(action.data);
+        const action_data = action.referenced
+          ? action.data
+          : clone(action.data);
         if (previousStateMap.has(namestring)) {
           currentStateMap.set(namestring, action_data);
         }

@@ -18,9 +18,7 @@ export default function useDispatch(action) {
   }
   const store = action.store || useNearestStore();
   if (!store) {
-    throw new Error(
-      "strange!! there is no store in useDispatch, please issue it."
-    );
+    throw new Error("odd!! there is no store in useDispatch, please issue it.");
   }
   action.store = store;
   let { type, ...others } = action;
@@ -51,13 +49,14 @@ export default function useDispatch(action) {
     return effect(...rest, {
       ...others,
       state: clonedValue,
-      setState: async (data, { cancelUpdate, callbacks } = {}) => {
+      setState: async (data, { cancelUpdate, callbacks, referenced } = {}) => {
         await store.dispatch({
           type: "modify",
           name: type[0],
           inner: store.inner,
           data,
           cancelUpdate,
+          referenced,
         });
         if (callbacks) {
           const value = clonedValue;
@@ -66,6 +65,9 @@ export default function useDispatch(action) {
       },
       select: (name, options) => {
         return get(name, store, options);
+      },
+      reference: (name, options = {}) => {
+        return get(name, store, { ...options, referenced: true });
       },
       getDispatch: (action) => {
         return useDispatch({ ...action, store });

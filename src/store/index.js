@@ -24,6 +24,7 @@ export function generateStore() {
   const debounceTimers = new Map();
   const previousStateMap = new Map();
   const currentStateMap = new Map();
+  const onChangeOtherProps = {};
   const initstore = {
     offline,
     offlineInstance,
@@ -41,6 +42,7 @@ export function generateStore() {
     debounceTimers,
     previousStateMap,
     currentStateMap,
+    onChangeOtherProps,
   };
   return initstore;
 }

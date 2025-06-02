@@ -1,6 +1,6 @@
 import { nanoid } from "nanoid";
 import clone from "../clone";
-import { isPlainObject, get, isEqual } from "lodash-es";
+import { isPlainObject, get, isEqual, set as _set } from "lodash-es";
 
 export const _split = "/";
 
@@ -108,6 +108,7 @@ export default async function reducer(action) {
     const debounceTimers = store.debounceTimers;
     const currentStateMap = store.currentStateMap;
     const previousStateMap = store.previousStateMap;
+    const onChangeOtherProps = store.onChangeOtherProps;
     const namestring = action.name;
     const names = getPathArray(namestring);
     const excludesarray = store.offlineExcludes;
@@ -118,10 +119,20 @@ export default async function reducer(action) {
     let onchangerun = false;
     if (!debounceTimers.has(namestring) && !isexcluded) {
       if (!isEqual(prestate, action.data)) {
-        const prestorestate = clone(store.runtime_state);
-        const pre_state = get(prestorestate, names.join("."));
+        const pre_state = clone(get(store.runtime_state, names.join(".")));
+        const prestorestate = {};
+        Object.keys(onChangeOtherProps).forEach((key) => {
+          const othercache = {};
+          const otherprops = onChangeOtherProps[key];
+          otherprops.forEach((prop) => {
+            const paths = getPathArray(prop);
+            const data = get(store.runtime_state, paths.join("."));
+            _set(othercache, paths.join("."), clone(data));
+          });
+          prestorestate[key] = othercache;
+        });
         previousStateMap.set(namestring, {
-          storestate: prestorestate,
+          prestorestate,
           prevalue: pre_state,
         });
         onchangerun = true;
@@ -181,10 +192,19 @@ export default async function reducer(action) {
       setTimeout(() => {
         const previousstate = previousStateMap.get(namestring);
         const currentstate = currentStateMap.get(namestring);
-        const subscribers = Object.values(store.changeSubscribes);
-        subscribers.forEach((fn) =>
-          fn(namestring, currentstate, previousstate)
-        );
+        const subscribers = Object.keys(store.changeSubscribes);
+        subscribers.forEach((k) => {
+          const callback = store.changeSubscribes[k];
+          const prevalue = previousstate.prevalue;
+          const otherprevalues = previousstate.prestorestate[k];
+          callback({
+            name: namestring,
+            currentvalue: currentstate,
+            prevalue,
+            otherprevalues,
+            currentstore: store.runtime_state,
+          });
+        });
         for (const key in store.observerSubscribes) {
           const paths = getPathArray(key);
           const namelength = names.length;

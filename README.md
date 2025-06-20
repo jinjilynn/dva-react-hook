@@ -1,6 +1,6 @@
 # dva-react-hook
 
-[![NPM](https://img.shields.io/badge/npm-v2.6.4-blue)](https://www.npmjs.com/package/dva-react-hook)
+[![NPM](https://img.shields.io/badge/npm-v2.6.5-blue)](https://www.npmjs.com/package/dva-react-hook)
 [![size](https://img.shields.io/badge/size-120KB-green)]()
 
 > React Hooks based, concise、lightweight framework, supporting offline storage, like blob,bufferArray and all primitive types.
@@ -15,10 +15,10 @@
   - [`Provider`](#Provider)
   - [`Dynamic`](#Dynamic)
   - [`Model`](#Model)
-  - [`useModel()`](#useModel)
-  - [`useDispatch()`](#useDispatch)
   - [`connect()`](#connect)
   - [`useAdd()`](#useAdd)
+  - [`useModel()`](#useModel)
+  - [`useDispatch()`](#useDispatch)
   - [`useChange()`](#useChange)
   - [`useReference()`](#useReference)
   - [`useObserver()`](#useObserver)
@@ -107,7 +107,7 @@ import React from "react";
 import Provider, { useDispatch, useModel } from "dva-react-hook";
 
 function App() {
-  const loginState = useModel("login_model")[0];
+  const [loginState] = useModel("login_model");
   const login = useDispatch({ type: "login_model/login" });
   return (
     <div>
@@ -184,7 +184,7 @@ import { Dynamic } from 'dva-react-hook';
     init: Function | Object | Number | Array | ..., //optional --default value is {}
     effects:{
       // Defining an async function is recommended, but it is not required
-      'some-effects-name': async ({ state, setState, select, getDispatch }) => {
+      'some-effects-name': async ({ state, setState, select, getDispatch,reference }) => {
         // { state, setState, select, getDispatch } this parameter is injected by the framework. it is always the last one in arguments. If you call this function by passing other parameters, the other parameters must be added before the injected parameter like this: async (args1, args2, { state, setState, select, getDispatch }) => {}, Otherwise, you will encounter errors
 
         // state: state.value is the state of this model, You can also declare value ( state:{value}) to get the state
@@ -264,7 +264,10 @@ const loginaction = useDispatch({ type: "login/login", otherproperties: "" });
 
 //so your code in model maybe like this   async login({ name,pass },{ state, setState, select, otherproperties }){}
 
-loginaction({ name, pass }, { state, select, setState, getDispatch })
+loginaction(
+  { name, pass },
+  { state, select, setState, getDispatch, otherproperties }
+)
   .then((data) => {
     // do something
   })

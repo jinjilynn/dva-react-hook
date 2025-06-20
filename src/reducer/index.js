@@ -216,13 +216,22 @@ export default async function reducer(action) {
           }
           if (namelength > pathlength) {
             if (checkPrefixRelation(paths, names)) {
-              store.observerSubscribes[key](currentstate, previousstate);
+              const parentcurrentstate = get(store.runtime_state, paths);
+              store.observerSubscribes[key](parentcurrentstate, {
+                path: names,
+                value: currentstate,
+                prevalue: previousstate,
+              });
             }
           }
           if (namelength < pathlength) {
             if (checkPrefixRelation(names, paths)) {
               if (!isEqual(previousstate.prevalue, currentstate)) {
-                store.observerSubscribes[key](currentstate, previousstate);
+                const childpaths = paths.filter((p) => !names.includes(p));
+                store.observerSubscribes[key](
+                  get(currentstate, childpaths),
+                  get(previousstate, childpaths)
+                );
               }
             }
           }

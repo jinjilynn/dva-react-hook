@@ -60,9 +60,9 @@ function Provider({
             customizer
           );
           _store.runtime_state[key] = _v;
-          window[`${identifier}${_key}`] = _store;
         })
         .then(() => {
+          window[`${identifier}${_key}`] = _store;
           setCombinedWithStore({ com: _Context.Provider, store: _store });
         })
         .catch((err) => {

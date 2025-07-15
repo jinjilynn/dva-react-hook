@@ -110,13 +110,23 @@ export default async function reducer(action) {
     const previousStateMap = store.previousStateMap;
     const onChangeOtherProps = store.onChangeOtherProps;
     const subkeys = Object.keys(store.changeSubscribes);
+    const subcalls = {};
+    subkeys.forEach((key) => {
+      const callback = store.changeSubscribes[key];
+      subcalls[key] = callback;
+    });
     const namestring = action.name;
     const names = getPathArray(namestring);
     const prestate = get(store.runtime_state, names);
+    const isChangePending = debounceTimers.has(namestring);
     let onchangerun = false;
-    if (!debounceTimers.has(namestring) && subkeys.length > 0) {
-      if (!isEqual(prestate, action.data)) {
-        const pre_state = clone(get(store.runtime_state, names));
+    if (subkeys.length > 0 && !isEqual(prestate, action.data)) {
+      if (isChangePending) {
+        const previousstate = previousStateMap.get(namestring);
+        previousstate.subkeys = subkeys;
+        previousstate.subcalls = subcalls;
+      } else {
+        const pre_state = clone(prestate);
         const prestorestate = {};
         Object.keys(onChangeOtherProps).forEach((key) => {
           const othercache = {};
@@ -132,10 +142,10 @@ export default async function reducer(action) {
           prestorestate,
           prevalue: pre_state,
           subkeys,
-          subcalls: store.changeSubscribes,
+          subcalls,
         });
-        onchangerun = true;
       }
+      onchangerun = true;
     }
     switch (action.type) {
       case "add":

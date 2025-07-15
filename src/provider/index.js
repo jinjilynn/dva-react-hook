@@ -23,7 +23,6 @@ function Provider({
   offlineConfig = {},
   noCached,
   children,
-  changedelay = 300,
   ...rest
 }) {
   const [combinedWithStore, setCombinedWithStore] = React.useState({

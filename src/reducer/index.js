@@ -109,31 +109,30 @@ export default async function reducer(action) {
     const currentStateMap = store.currentStateMap;
     const previousStateMap = store.previousStateMap;
     const onChangeOtherProps = store.onChangeOtherProps;
+    const subkeys = Object.keys(store.changeSubscribes);
     const namestring = action.name;
     const names = getPathArray(namestring);
-    const excludesarray = store.offlineExcludes;
-    const isexcluded = excludesarray.some((path) =>
-      checkPrefixRelation(getPathArray(path), names)
-    );
-    const prestate = get(store.runtime_state, names.join("."));
+    const prestate = get(store.runtime_state, names);
     let onchangerun = false;
-    if (!debounceTimers.has(namestring) && !isexcluded) {
+    if (!debounceTimers.has(namestring) && subkeys.length > 0) {
       if (!isEqual(prestate, action.data)) {
-        const pre_state = clone(get(store.runtime_state, names.join(".")));
+        const pre_state = clone(get(store.runtime_state, names));
         const prestorestate = {};
         Object.keys(onChangeOtherProps).forEach((key) => {
           const othercache = {};
           const otherprops = onChangeOtherProps[key];
           otherprops.forEach((prop) => {
             const paths = getPathArray(prop);
-            const data = get(store.runtime_state, paths.join("."));
-            _set(othercache, paths.join("."), clone(data));
+            const data = get(store.runtime_state, paths);
+            _set(othercache, paths, clone(data));
           });
           prestorestate[key] = othercache;
         });
         previousStateMap.set(namestring, {
           prestorestate,
           prevalue: pre_state,
+          subkeys,
+          subcalls: store.changeSubscribes,
         });
         onchangerun = true;
       }
@@ -192,12 +191,14 @@ export default async function reducer(action) {
       setTimeout(() => {
         const previousstate = previousStateMap.get(namestring);
         const currentstate = currentStateMap.get(namestring);
-        const subscribers = Object.keys(store.changeSubscribes);
+        const subscribers = previousstate.subkeys;
+        const calls = previousstate.subcalls;
         subscribers.forEach((k) => {
-          const callback = store.changeSubscribes[k];
+          const callback = calls[k];
           const prevalue = previousstate.prevalue;
           const otherprevalues = previousstate.prestorestate[k];
           callback({
+            actiontype: action.type,
             name: namestring,
             currentvalue: currentstate,
             prevalue,
@@ -211,7 +212,11 @@ export default async function reducer(action) {
           const pathlength = paths.length;
           if (namelength === pathlength) {
             if (isEqual(names, paths)) {
-              store.observerSubscribes[key](currentstate, previousstate);
+              store.observerSubscribes[key](
+                currentstate,
+                previousstate,
+                action.type
+              );
             }
           }
           if (namelength > pathlength) {
@@ -221,6 +226,7 @@ export default async function reducer(action) {
                 path: names,
                 value: currentstate,
                 prevalue: previousstate,
+                actiontype: action.type,
               });
             }
           }
@@ -230,7 +236,8 @@ export default async function reducer(action) {
                 const childpaths = paths.filter((p) => !names.includes(p));
                 store.observerSubscribes[key](
                   get(currentstate, childpaths),
-                  get(previousstate, childpaths)
+                  get(previousstate, childpaths),
+                  action.type
                 );
               }
             }
@@ -239,7 +246,7 @@ export default async function reducer(action) {
         debounceTimers.delete(namestring);
         previousStateMap.delete(namestring);
         currentStateMap.delete(namestring);
-      }, store.changedelay)
+      }, 300)
     );
   }
 }

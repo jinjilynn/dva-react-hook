@@ -7,17 +7,20 @@ import reducer from "../reducer";
 import initStore from "../utils/redux";
 import { registeModel } from "../dynamic";
 
-function generateContext(_key, _com_key) {
+function generateContext(_key, _com_key, isolated) {
   const Context = React.createContext();
   let _store = getStoreByKey(_key);
   if (!_store) {
     _store = generateStore();
   }
-  store[_com_key] = Context;
+  if (!isolated) {
+    store.push({ uid: _com_key, context: Context });
+  }
   return [_store, Context];
 }
 
 function Provider({
+  isolated = false,
   uniqueKey,
   models,
   offlineConfig = {},
@@ -33,7 +36,7 @@ function Provider({
     const _new_uid = nanoid();
     const _key = (uniqueKey && uniqueKey.toString()) || "default";
     const _com_key = `${_key}_${_new_uid}`;
-    const [_store, _Context] = generateContext(_key, _com_key);
+    const [_store, _Context] = generateContext(_key, _com_key, isolated);
     _store.offline = offlineConfig.offline === true;
     _store.offlineExcludes = offlineConfig.excludes || [];
     const customizer = offlineConfig.customizer;
@@ -79,7 +82,10 @@ function Provider({
       notrecover();
     }
     return () => {
-      delete store[_com_key];
+      const storeIndex = store.findIndex((item) => item.uid === _com_key);
+      if (storeIndex !== -1) {
+        store.splice(storeIndex, 1);
+      }
       noCached === true && delete window[`${identifier}${_key}`];
       localForage.dropInstance({ name: _key });
       setCombinedWithStore({ com: null, store: null });

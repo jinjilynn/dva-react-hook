@@ -1,6 +1,6 @@
 import React from "react";
 
-const store = {};
+const store = [];
 
 export const identifier = "dva_react_hook_store_";
 
@@ -57,9 +57,8 @@ export function getStoreByKey(key) {
 
 export function useNearestStore() {
   let _nearst_state;
-  const _store_values = Object.values(store).reverse();
-  for (let i = 0; i < _store_values.length; i += 1) {
-    const _item = React.useContext(_store_values[i]);
+  for (let i = 0; i < store.length; i += 1) {
+    const _item = React.useContext(store[i].context);
     if (_item) {
       _nearst_state = _item;
       break;

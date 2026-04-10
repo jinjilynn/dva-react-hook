@@ -3,7 +3,7 @@
 # dependencies
 /node_modules
 /webpack/node_modules
-
+/dist
 
 # misc
 .DS_Store

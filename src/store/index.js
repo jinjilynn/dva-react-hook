@@ -1,8 +1,8 @@
-import React from "react";
+import React from 'react';
 
 const store = [];
 
-export const identifier = "dva_react_hook_store_";
+export const identifier = 'dva_react_hook_store_';
 
 export function generateStore() {
   const inner = Symbol();
@@ -13,6 +13,7 @@ export function generateStore() {
     name: null,
   };
   const dispatch_queue = [];
+  let dispatchPromise = null;
   let runtime_state = {};
   let REDUCER;
   let dispatch;
@@ -37,6 +38,7 @@ export function generateStore() {
     isDispatching,
     runtime_state,
     dispatch_queue,
+    dispatchPromise,
     changeSubscribes,
     observerSubscribes,
     debounceTimers,
@@ -56,15 +58,16 @@ export function getStoreByKey(key) {
 }
 
 export function useNearestStore() {
-  let _nearst_state;
+  let nearestState;
   for (let i = 0; i < store.length; i += 1) {
-    const _item = React.useContext(store[i].context);
-    if (_item) {
-      _nearst_state = _item;
+    const item = store[i];
+    const current = React.useContext(item.context);
+    if (current) {
+      nearestState = current;
       break;
     }
   }
-  return _nearst_state;
+  return nearestState;
 }
 
 export default store;

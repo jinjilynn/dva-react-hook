@@ -1,8 +1,8 @@
-import { nanoid } from "nanoid";
-import clone from "../clone";
-import { isPlainObject, get, isEqual, set as _set } from "lodash-es";
+import { nanoid } from 'nanoid';
+import clone from '../clone';
+import { isPlainObject, get, isEqual, set as _set } from 'lodash-es';
 
-export const _split = "/";
+export const _split = '/';
 
 const pathCache = new Map();
 export function getPathArray(path) {
@@ -33,7 +33,7 @@ export async function endurance(store, names, temp_state) {
 }
 
 function createNestedObject(parts, initvalue) {
-  if (typeof parts === "string") {
+  if (typeof parts === 'string') {
     parts = getPathArray(parts);
   }
   let obj = {};
@@ -54,7 +54,7 @@ function filterExcludes(exarray, name) {
 }
 
 function deleteNestedKey(obj, parts) {
-  if (typeof parts === "string") {
+  if (typeof parts === 'string') {
     parts = getPathArray(parts);
   }
   parts = parts.slice(1);
@@ -102,7 +102,7 @@ export function checkPrefixRelation(prearray, currentarray) {
 export default async function reducer(action) {
   const store = this;
   if (!store) {
-    throw new Error("odd!! there is no store in reducer, please issue it.");
+    throw new Error('odd!! there is no store in reducer, please issue it.');
   }
   if (action.inner === store.inner) {
     const debounceTimers = store.debounceTimers;
@@ -148,8 +148,11 @@ export default async function reducer(action) {
       onchangerun = true;
     }
     switch (action.type) {
-      case "add":
-        const init_data = clone(action.data);
+      case 'add':
+        const init_value = Object.prototype.hasOwnProperty.call(action, 'data')
+          ? action.data
+          : action.initdate;
+        const init_data = clone(init_value);
         if (previousStateMap.has(namestring)) {
           currentStateMap.set(namestring, init_data);
         }
@@ -159,7 +162,7 @@ export default async function reducer(action) {
         if (!keys.includes(names[0]))
           endurance(store, names, store.runtime_state);
         break;
-      case "modify":
+      case 'modify':
         if (isEqual(prestate, action.data)) {
           return;
         }
@@ -217,38 +220,41 @@ export default async function reducer(action) {
           });
         });
         for (const key in store.observerSubscribes) {
+          const subscribers = Object.values(store.observerSubscribes[key]);
           const paths = getPathArray(key);
           const namelength = names.length;
           const pathlength = paths.length;
           if (namelength === pathlength) {
             if (isEqual(names, paths)) {
-              store.observerSubscribes[key](
-                currentstate,
-                previousstate,
-                action.type
-              );
+              subscribers.forEach((subscriber) => {
+                subscriber(currentstate, previousstate.prevalue, action.type);
+              });
             }
           }
           if (namelength > pathlength) {
             if (checkPrefixRelation(paths, names)) {
               const parentcurrentstate = get(store.runtime_state, paths);
-              store.observerSubscribes[key](parentcurrentstate, {
-                path: names,
-                value: currentstate,
-                prevalue: previousstate,
-                actiontype: action.type,
+              subscribers.forEach((subscriber) => {
+                subscriber(parentcurrentstate, {
+                  path: names,
+                  value: currentstate,
+                  prevalue: previousstate.prevalue,
+                  actiontype: action.type,
+                });
               });
             }
           }
           if (namelength < pathlength) {
             if (checkPrefixRelation(names, paths)) {
               if (!isEqual(previousstate.prevalue, currentstate)) {
-                const childpaths = paths.filter((p) => !names.includes(p));
-                store.observerSubscribes[key](
-                  get(currentstate, childpaths),
-                  get(previousstate, childpaths),
-                  action.type
-                );
+                const childpaths = paths.slice(names.length);
+                subscribers.forEach((subscriber) => {
+                  subscriber(
+                    get(currentstate, childpaths),
+                    get(previousstate.prevalue, childpaths),
+                    action.type,
+                  );
+                });
               }
             }
           }
@@ -256,7 +262,7 @@ export default async function reducer(action) {
         debounceTimers.delete(namestring);
         previousStateMap.delete(namestring);
         currentStateMap.delete(namestring);
-      }, 300)
+      }, 300),
     );
   }
 }

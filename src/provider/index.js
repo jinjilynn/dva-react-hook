@@ -1,22 +1,22 @@
-import React from "react";
-import * as localForage from "localforage";
-import { nanoid } from "nanoid";
-import { mergeWith } from "lodash-es";
-import store, { generateStore, getStoreByKey, identifier } from "../store";
-import reducer from "../reducer";
-import initStore from "../utils/redux";
-import { registeModel } from "../dynamic";
+import React from 'react';
+import * as localForage from 'localforage';
+import { nanoid } from 'nanoid';
+import { mergeWith } from 'lodash-es';
+import store, { generateStore, getStoreByKey, identifier } from '../store';
+import reducer from '../reducer';
+import initStore from '../utils/redux';
+import { registeModel } from '../dynamic';
 
-function generateContext(_key, _com_key, isolated) {
+function generateContext(key, componentKey, isolated) {
   const Context = React.createContext();
-  let _store = getStoreByKey(_key);
-  if (!_store) {
-    _store = generateStore();
+  let nearestStore = getStoreByKey(key);
+  if (!nearestStore) {
+    nearestStore = generateStore();
   }
   if (!isolated) {
-    store.push({ uid: _com_key, context: Context });
+    store.push({ uid: componentKey, context: Context });
   }
-  return [_store, Context];
+  return [nearestStore, Context];
 }
 
 function Provider({
@@ -33,12 +33,14 @@ function Provider({
     store: null,
   });
   React.useEffect(() => {
-    const _new_uid = nanoid();
-    const _key = (uniqueKey && uniqueKey.toString()) || "default";
-    const _com_key = `${_key}_${_new_uid}`;
-    const [_store, _Context] = generateContext(_key, _com_key, isolated);
+    const uid = nanoid();
+    const _key = (uniqueKey && uniqueKey.toString()) || 'default';
+    const componentKey = `${_key}_${uid}`;
+    const [_store, _Context] = generateContext(_key, componentKey, isolated);
+    let unmounted = false;
     _store.offline = offlineConfig.offline === true;
     _store.offlineExcludes = offlineConfig.excludes || [];
+    _store.noCached = noCached === true;
     const customizer = offlineConfig.customizer;
     _store.offlineInstance = localForage.createInstance({
       name: _key,
@@ -52,29 +54,32 @@ function Provider({
         }
       }
     };
+    const mountStore = () => {
+      if (unmounted) {
+        return;
+      }
+      !isolated && (window[`${identifier}${_key}`] = _store);
+      setCombinedWithStore({ com: _Context.Provider, store: _store });
+    };
     const recover = async () => {
       await _init();
-      _store.offlineInstance
-        .iterate((value, key) => {
+      try {
+        await _store.offlineInstance.iterate((value, key) => {
           const _v = mergeWith(
             _store.runtime_state[key] || {},
             value,
-            customizer
+            customizer,
           );
           _store.runtime_state[key] = _v;
-        })
-        .then(() => {
-          window[`${identifier}${_key}`] = _store;
-          setCombinedWithStore({ com: _Context.Provider, store: _store });
-        })
-        .catch((err) => {
-          console.error(`recover from offline database failed:${err}`);
         });
+        mountStore();
+      } catch (err) {
+        console.error(`recover from offline database failed:${err}`);
+      }
     };
     const notrecover = async () => {
       await _init();
-      window[`${identifier}${_key}`] = _store;
-      setCombinedWithStore({ com: _Context.Provider, store: _store });
+      mountStore();
     };
     if (offlineConfig.autoRecover === true) {
       recover();
@@ -82,24 +87,21 @@ function Provider({
       notrecover();
     }
     return () => {
-      const storeIndex = store.findIndex((item) => item.uid === _com_key);
+      unmounted = true;
+      const storeIndex = store.findIndex((item) => item.uid === componentKey);
       if (storeIndex !== -1) {
         store.splice(storeIndex, 1);
       }
-      noCached === true && delete window[`${identifier}${_key}`];
-      localForage.dropInstance({ name: _key });
+      !isolated && noCached === true && delete window[`${identifier}${_key}`];
       setCombinedWithStore({ com: null, store: null });
+      _store.offlineInstance.dropInstance();
     };
-  }, [uniqueKey]);
-  !!combinedWithStore.com &&
-    console.log(`Provider for ${uniqueKey || "default"} is rendering`);
-  return (
-    !!combinedWithStore.com && (
-      <combinedWithStore.com value={combinedWithStore.store}>
-        {children}
-      </combinedWithStore.com>
-    )
-  );
+  }, [isolated, noCached, uniqueKey]);
+  return combinedWithStore.com ? (
+    <combinedWithStore.com value={combinedWithStore.store}>
+      {children}
+    </combinedWithStore.com>
+  ) : null;
 }
 
 export default Provider;

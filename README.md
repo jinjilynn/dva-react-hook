@@ -1,6 +1,6 @@
 # dva-react-hook
 
-[![NPM](https://img.shields.io/badge/npm-v2.7.0-blue)](https://www.npmjs.com/package/dva-react-hook)
+[![NPM](https://img.shields.io/badge/npm-v2.7.2-blue)](https://www.npmjs.com/package/dva-react-hook)
 [![size](https://img.shields.io/badge/size-120KB-green)]()
 
 > React Hooks based, concise, lightweight state-management framework with
@@ -11,25 +11,42 @@
 
 ## Table of Contents
 
-- [Install](#install)
-- [Quick Start](#quick-start)
-- [Usage](#usage)
-  - [`Provider`](#provider)
-  - [`offlineConfig`](#offlineconfig)
-  - [`Dynamic`](#dynamic)
-  - [`Model`](#model)
-  - [`Model.callbacks`](#modelcallbacks)
-  - [`connect`](#connect)
-  - [`useAdd`](#useadd)
-  - [`useModel`](#usemodel)
-  - [`useReference`](#usereference)
-  - [`useDispatch`](#usedispatch)
-  - [`useChange`](#usechange)
-  - [`useObserver`](#useobserver)
-  - [`useNearestStore`](#usenereststore)
-  - [Utility exports: `clone`, `get`, `getPathArray`, `checkPrefixRelation`](#utility-exports)
-- [TypeScript](#typescript)
-- [License](#license)
+- [dva-react-hook](#dva-react-hook)
+  - [Table of Contents](#table-of-contents)
+  - [Install](#install)
+    - [In Node.js](#in-nodejs)
+  - [Quick Start](#quick-start)
+  - [Usage](#usage)
+    - [`Provider`](#provider)
+    - [`offlineConfig`](#offlineconfig)
+      - [Examples](#examples)
+    - [`Dynamic`](#dynamic)
+      - [Examples](#examples-1)
+    - [`Model`](#model)
+      - [Helpers injected into effects](#helpers-injected-into-effects)
+      - [Examples](#examples-2)
+    - [`Model.callbacks`](#modelcallbacks)
+      - [Examples](#examples-3)
+    - [`connect`](#connect)
+      - [Plain-HOC form (no decorator support)](#plain-hoc-form-no-decorator-support)
+    - [`useAdd`](#useadd)
+      - [Examples](#examples-4)
+    - [`useModel`](#usemodel)
+      - [More examples](#more-examples)
+    - [`useReference`](#usereference)
+      - [More examples](#more-examples-1)
+    - [`useDispatch`](#usedispatch)
+      - [More examples](#more-examples-2)
+    - [`useChange`](#usechange)
+      - [More examples](#more-examples-3)
+    - [`useObserver`](#useobserver)
+      - [More examples](#more-examples-4)
+    - [`useNearestStore`](#useneareststore)
+      - [Examples](#examples-5)
+    - [Utility exports](#utility-exports)
+      - [Examples](#examples-6)
+  - [TypeScript](#typescript)
+  - [License](#license)
 
 ## Install
 
@@ -96,14 +113,14 @@ you place a single `Provider` at the root, but multiple (nested or sibling)
 Providers are fully supported. Components always bind to the **nearest**
 Provider.
 
-| Prop            | Type                   | Default       | Description                                                                                                                                                                                                                                |
-| --------------- | ---------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `uniqueKey`     | `string \| number`     | `'default'`   | Shares state across sibling Providers. Two Providers with the same `uniqueKey` (and `isolated === false`) share the same underlying store.                                                                                                 |
-| `isolated`      | `boolean`              | `false`       | When `true`, this Provider is **not** registered in the global list, so `useNearestStore()` lookups from outside its subtree ignore it. Use for encapsulated widgets.                                                                       |
-| `noCached`      | `boolean`              | `false`       | When `true`, the store is **not** reused from the module-level cache on remount, and the cache entry is dropped on unmount. The offline DB is always dropped on unmount regardless.                                                        |
-| `models`        | `Model[]`              | `[]`          | Array of `Model` objects to register on mount.                                                                                                                                                                                             |
-| `offlineConfig` | `OfflineConfig`        | `{}`          | See [offlineConfig](#offlineconfig).                                                                                                                                                                                                       |
-| `...rest`       | Any other props        |               | Treated as the initial `runtime_state`. A prop `{ foo: 1 }` becomes `state.foo = 1`.                                                                                                                                                       |
+| Prop            | Type               | Default     | Description                                                                                                                                                                         |
+| --------------- | ------------------ | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `uniqueKey`     | `string \| number` | `'default'` | Shares state across sibling Providers. Two Providers with the same `uniqueKey` (and `isolated === false`) share the same underlying store.                                          |
+| `isolated`      | `boolean`          | `false`     | When `true`, this Provider is **not** registered in the global list, so `useNearestStore()` lookups from outside its subtree ignore it. Use for encapsulated widgets.               |
+| `noCached`      | `boolean`          | `false`     | When `true`, the store is **not** reused from the module-level cache on remount, and the cache entry is dropped on unmount. The offline DB is always dropped on unmount regardless. |
+| `models`        | `Model[]`          | `[]`        | Array of `Model` objects to register on mount.                                                                                                                                      |
+| `offlineConfig` | `OfflineConfig`    | `{}`        | See [offlineConfig](#offlineconfig).                                                                                                                                                |
+| `...rest`       | Any other props    |             | Treated as the initial `runtime_state`. A prop `{ foo: 1 }` becomes `state.foo = 1`.                                                                                                |
 
 > ⚠️ Don't name an initial-state prop `models` — that prop is reserved.
 
@@ -141,7 +158,7 @@ const loginModel = {
 
 ReactDOM.render(
   <Provider
-    uniqueKey="namespace"
+    uniqueKey='namespace'
     noCached={true}
     isolated={false}
     offlineConfig={{
@@ -164,12 +181,12 @@ ReactDOM.render(
 Controls how state is persisted to IndexedDB / WebSQL / localStorage via
 [localForage](https://github.com/localForage/localForage).
 
-| Field         | Type                                            | Description                                                                                                                                                                          |
-| ------------- | ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `offline`     | `boolean`                                       | Enable persistence. Every `modify` / `add` writes the top-level model's slice to storage.                                                                                            |
-| `autoRecover` | `boolean`                                       | On mount, load all persisted slices and merge them into `runtime_state` **before** the `Provider` becomes visible. Without `autoRecover`, persisted values are written-only.         |
-| `excludes`    | `string[]`                                      | Paths to strip before writing to storage (e.g. `['user/token']`). The top-level model is still written; only the nested paths are scrubbed via a clone.                              |
-| `customizer`  | `(objValue, srcValue, key, object, source) => any` | Passed to lodash's `mergeWith` when `autoRecover` merges persisted values over the current state. Return `undefined` to use the default merge.                                    |
+| Field         | Type                                               | Description                                                                                                                                                                  |
+| ------------- | -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `offline`     | `boolean`                                          | Enable persistence. Every `modify` / `add` writes the top-level model's slice to storage.                                                                                    |
+| `autoRecover` | `boolean`                                          | On mount, load all persisted slices and merge them into `runtime_state` **before** the `Provider` becomes visible. Without `autoRecover`, persisted values are written-only. |
+| `excludes`    | `string[]`                                         | Paths to strip before writing to storage (e.g. `['user/token']`). The top-level model is still written; only the nested paths are scrubbed via a clone.                      |
+| `customizer`  | `(objValue, srcValue, key, object, source) => any` | Passed to lodash's `mergeWith` when `autoRecover` merges persisted values over the current state. Return `undefined` to use the default merge.                               |
 
 During persistence, values that can't be meaningfully serialised (functions,
 DOM nodes, promises, workers, regex, symbols, weak-collections) are written
@@ -182,7 +199,7 @@ real `Date` instances.
 
 ```tsx
 <Provider
-  uniqueKey="app"
+  uniqueKey='app'
   models={[userModel, cartModel]}
   offlineConfig={{ offline: true, autoRecover: true }}
 >
@@ -195,7 +212,7 @@ real `Date` instances.
 
 ```tsx
 <Provider
-  uniqueKey="app"
+  uniqueKey='app'
   models={[userModel]}
   offlineConfig={{
     offline: true,
@@ -217,12 +234,12 @@ const customizer = (objValue, srcValue) => {
 };
 
 <Provider
-  uniqueKey="app"
+  uniqueKey='app'
   models={[favouritesModel]}
   offlineConfig={{ offline: true, autoRecover: true, customizer }}
 >
   <App />
-</Provider>
+</Provider>;
 ```
 
 **4. Direct access to the underlying `localforage` instance** from inside an
@@ -245,12 +262,12 @@ const userModel = {
 
 Lazy-load a component and (optionally) its models.
 
-| Prop           | Type                                                                                       | Description                                          |
-| -------------- | ------------------------------------------------------------------------------------------ | ---------------------------------------------------- |
-| `component`    | `() => Promise<{ default: React.ComponentType }>`                                          | Passed to `React.lazy`.                              |
-| `models`       | `(() => ...) \| Array<Model \| Model[] \| Promise<Model \| Model[] \| DynamicModule>>`     | Models to register before rendering.                 |
-| `renderBefore` | `() => void`                                                                               | Hook invoked before async loading starts.            |
-| `...rest`      | Any                                                                                        | Forwarded to the lazy component.                     |
+| Prop           | Type                                                                                   | Description                               |
+| -------------- | -------------------------------------------------------------------------------------- | ----------------------------------------- |
+| `component`    | `() => Promise<{ default: React.ComponentType }>`                                      | Passed to `React.lazy`.                   |
+| `models`       | `(() => ...) \| Array<Model \| Model[] \| Promise<Model \| Model[] \| DynamicModule>>` | Models to register before rendering.      |
+| `renderBefore` | `() => void`                                                                           | Hook invoked before async loading starts. |
+| `...rest`      | Any                                                                                    | Forwarded to the lazy component.          |
 
 #### Examples
 
@@ -298,11 +315,7 @@ a progress bar or ping analytics:
 props is passed straight through:
 
 ```tsx
-<Dynamic
-  component={() => import('./pages/User')}
-  userId={42}
-  readonly
-/>
+<Dynamic component={() => import('./pages/User')} userId={42} readonly />
 ```
 
 If loading fails the component keeps the state `{ loaded: false, error }`
@@ -334,14 +347,14 @@ callbacks that operate on it.
 
 #### Helpers injected into effects
 
-| Helper            | Signature                                                                        | Notes                                                                                                             |
-| ----------------- | -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `state`           | Any                                                                              | A **deep clone** of the model's current state when the effect started.                                            |
-| `setState`        | `(data, { cancelUpdate?, callbacks?, referenced? }) => Promise<void>`            | Writes `data` to this model. `cancelUpdate` suppresses re-renders; `referenced` skips the defensive clone on write.|
-| `select`          | `(path, options?) => [value, setValue, getLatest]`                               | Same contract as `useModel`, but not a Hook.                                                                      |
-| `reference`       | `(path, options?) => [value, setValue, getLatest]`                               | Like `select` but returns the live reference instead of a clone.                                                  |
-| `getDispatch`     | `(action) => (...args) => Promise<any>`                                          | Pure factory — build another model's effect dispatcher without calling a Hook.                                    |
-| `offlineInstance` | `localforage` instance                                                           | Direct access to the Provider's offline DB.                                                                       |
+| Helper            | Signature                                                             | Notes                                                                                                               |
+| ----------------- | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `state`           | Any                                                                   | A **deep clone** of the model's current state when the effect started.                                              |
+| `setState`        | `(data, { cancelUpdate?, callbacks?, referenced? }) => Promise<void>` | Writes `data` to this model. `cancelUpdate` suppresses re-renders; `referenced` skips the defensive clone on write. |
+| `select`          | `(path, options?) => [value, setValue, getLatest]`                    | Same contract as `useModel`, but not a Hook.                                                                        |
+| `reference`       | `(path, options?) => [value, setValue, getLatest]`                    | Like `select` but returns the live reference instead of a clone.                                                    |
+| `getDispatch`     | `(action) => (...args) => Promise<any>`                               | Pure factory — build another model's effect dispatcher without calling a Hook.                                      |
+| `offlineInstance` | `localforage` instance                                                | Direct access to the Provider's offline DB.                                                                         |
 
 All extra properties you attached to the original `useDispatch({ type, ... })`
 action are spread into `helpers` as well.
@@ -369,7 +382,8 @@ const sessionModel = {
   name: 'session',
   init: () => ({ startedAt: Date.now(), visitId: crypto.randomUUID() }),
   effects: {
-    touch: (_, { state, setState }) => setState({ ...state, lastAt: Date.now() }),
+    touch: (_, { state, setState }) =>
+      setState({ ...state, lastAt: Date.now() }),
   },
 };
 ```
@@ -492,7 +506,10 @@ const userModel = {
   init: { name: '', loggedIn: false },
   effects: {
     login: async (credentials, { setState }) => {
-      await setState({ ...credentials, loggedIn: true }, { callbacks: 'onLogin' });
+      await setState(
+        { ...credentials, loggedIn: true },
+        { callbacks: 'onLogin' },
+      );
     },
   },
   callbacks: {
@@ -546,7 +563,9 @@ class List extends React.Component {
       <div>
         <button onClick={reload}>reload</button>
         <ul>
-          {listState.items.map((x) => <li key={x.id}>{x.label}</li>)}
+          {listState.items.map((x) => (
+            <li key={x.id}>{x.label}</li>
+          ))}
         </ul>
       </div>
     );
@@ -603,7 +622,9 @@ re-run whenever `name` flips:
 function TabState({ tabId }) {
   useAdd(`tabs/${tabId}`, { scroll: 0 }); // no `once` → re-runs on tabId change
   const [tab, setTab] = useModel(`tabs/${tabId}`);
-  return <Scroller value={tab.scroll} onChange={(v) => setTab({ scroll: v })} />;
+  return (
+    <Scroller value={tab.scroll} onChange={(v) => setTab({ scroll: v })} />
+  );
 }
 ```
 
@@ -623,10 +644,10 @@ Binds a component to the state at `name` and returns:
 3. `getLatest()` – reads the freshest value at call time (bypasses the
    render snapshot).
 
-| Parameter      | Description                                                                                                |
-| -------------- | ---------------------------------------------------------------------------------------------------------- |
-| `cancelUpdate` | When `true`, this component does **not** re-render on changes at `name`. Useful for write-only bindings.   |
-| `options`      | `{ autoCreate?, defaultValue?, referenced?, resetField?, resetValue? }`.                                   |
+| Parameter      | Description                                                                                              |
+| -------------- | -------------------------------------------------------------------------------------------------------- |
+| `cancelUpdate` | When `true`, this component does **not** re-render on changes at `name`. Useful for write-only bindings. |
+| `options`      | `{ autoCreate?, defaultValue?, referenced?, resetField?, resetValue? }`.                                 |
 
 `autoCreate: true` with `defaultValue` lazily creates missing nested paths.
 `resetField: true` with `resetValue` rewrites the stored value when its
@@ -783,9 +804,15 @@ const loginaction = useDispatch({ type: 'login/login', role: 'admin' });
 // async login({ name, pass }, { state, setState, select, getDispatch, reference, role }) {}
 
 loginaction({ name, pass })
-  .then((data) => { /* ... */ })
-  .catch((error) => { /* ... */ })
-  .finally(() => { /* ... */ });
+  .then((data) => {
+    /* ... */
+  })
+  .catch((error) => {
+    /* ... */
+  })
+  .finally(() => {
+    /* ... */
+  });
 ```
 
 #### More examples
@@ -926,7 +953,8 @@ useChange(
 function Watcher({ userId }) {
   useChange(
     ({ name }) => {
-      if (name.startsWith(`users/${userId}`)) analytics.track('user-change', userId);
+      if (name.startsWith(`users/${userId}`))
+        analytics.track('user-change', userId);
     },
     [userId],
   );
@@ -1016,11 +1044,7 @@ useObserver('user/profile', (profile, previous, actionType) => {
 
 ```javascript
 function Row({ id }) {
-  useObserver(
-    `rows/${id}`,
-    (cur) => console.log('row', id, cur),
-    [id],
-  );
+  useObserver(`rows/${id}`, (cur) => console.log('row', id, cur), [id]);
   return null;
 }
 ```
@@ -1086,12 +1110,12 @@ function BridgeToChild({ children }) {
 
 ### Utility exports
 
-| Export                                     | Description                                                                                  |
-| ------------------------------------------ | -------------------------------------------------------------------------------------------- |
-| `clone(value, offline?)`                   | Deep clone built on `lodash.cloneDeepWith`. `offline=true` drops non-serialisable values.    |
-| `get(name, store, options?)`               | Non-Hook version of `useModel`. Returns `[value, setValue, getLatest]`.                      |
-| `getPathArray(path)`                       | Cached split of `'a/b/c'` into `['a','b','c']`.                                              |
-| `checkPrefixRelation(prefix, target)`      | Returns `true` when `prefix` is a (non-strict) prefix of `target`.                           |
+| Export                                | Description                                                                               |
+| ------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `clone(value, offline?)`              | Deep clone built on `lodash.cloneDeepWith`. `offline=true` drops non-serialisable values. |
+| `get(name, store, options?)`          | Non-Hook version of `useModel`. Returns `[value, setValue, getLatest]`.                   |
+| `getPathArray(path)`                  | Cached split of `'a/b/c'` into `['a','b','c']`.                                           |
+| `checkPrefixRelation(prefix, target)` | Returns `true` when `prefix` is a (non-strict) prefix of `target`.                        |
 
 #### Examples
 
@@ -1135,7 +1159,7 @@ function useSyncMirror() {
 import { getPathArray } from 'dva-react-hook';
 
 getPathArray('user/profile/name'); // ['user', 'profile', 'name']
-getPathArray('user/profile/');     // ['user', 'profile']  (trailing slash stripped)
+getPathArray('user/profile/'); // ['user', 'profile']  (trailing slash stripped)
 ```
 
 **4. `checkPrefixRelation` — is A a prefix of B?**:

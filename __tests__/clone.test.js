@@ -11,11 +11,16 @@ describe('clone', () => {
     expect(copied.c).not.toBe(source.c);
   });
 
-  test('converts Date to timestamp', () => {
+  test('preserves Date type on clone and serialises when offline=true', () => {
     const date = new Date('2024-01-01T00:00:00.000Z');
     const copied = clone({ date });
 
-    expect(copied.date).toBe(date.getTime());
+    expect(copied.date).toBeInstanceOf(Date);
+    expect(copied.date).not.toBe(date);
+    expect(copied.date.getTime()).toBe(date.getTime());
+
+    const offlineCopy = clone({ date }, true);
+    expect(offlineCopy.date).toBe(date.getTime());
   });
 
   test('clones typed array by value', () => {

@@ -28,6 +28,10 @@ export default function useAdd(name, initdate, once) {
     () => {
       dispatch({ type: 'add', name, data, inner: store.inner });
     },
-    once ? [] : undefined,
+    // When `once` is truthy, run exactly once on mount.
+    // Otherwise re-run only when the target name changes (previously this was
+    // `undefined`, which caused the effect to run on every render and triggered
+    // an infinite dispatch loop).
+    once ? [] : [name],
   );
 }

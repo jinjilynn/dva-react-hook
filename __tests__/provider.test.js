@@ -6,7 +6,8 @@ import { registeModel } from '../src/dynamic';
 import mountedStores, {
   generateStore,
   getStoreByKey,
-  identifier,
+  setStoreByKey,
+  deleteStoreByKey,
 } from '../src/store';
 
 jest.mock('localforage', () => ({
@@ -25,6 +26,8 @@ jest.mock('../src/store', () => ({
   default: [],
   generateStore: jest.fn(),
   getStoreByKey: jest.fn(),
+  setStoreByKey: jest.fn(),
+  deleteStoreByKey: jest.fn(),
   identifier: 'dva_react_hook_store_',
 }));
 
@@ -83,7 +86,6 @@ describe('Provider', () => {
     React.useState.mockRestore();
     React.useEffect.mockRestore();
     mountedStores.length = 0;
-    delete window[`${identifier}demo`];
   });
 
   test('initializes store and registers models before mount', async () => {
@@ -103,7 +105,7 @@ describe('Provider', () => {
       store,
     );
     expect(registeModel).toHaveBeenCalledWith({ name: 'user' }, store);
-    expect(window[`${identifier}demo`]).toBe(store);
+    expect(setStoreByKey).toHaveBeenCalledWith('demo', store);
     expect(mountedStores).toHaveLength(1);
     expect(mountedStores[0]).toEqual(
       expect.objectContaining({ uid: expect.stringMatching(/^demo_/) }),
@@ -142,7 +144,7 @@ describe('Provider', () => {
     await flushPromises();
     cleanup();
 
-    expect(window[`${identifier}demo`]).toBeUndefined();
+    expect(deleteStoreByKey).toHaveBeenCalledWith('demo');
     expect(offlineInstance.dropInstance).toHaveBeenCalledTimes(1);
     expect(mountedStores).toHaveLength(0);
     expect(setCombinedWithStore).toHaveBeenLastCalledWith({

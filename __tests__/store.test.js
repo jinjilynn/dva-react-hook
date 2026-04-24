@@ -1,4 +1,4 @@
-import { generateStore, getStoreByKey, identifier } from '../src/store';
+import { generateStore, getStoreByKey, setStoreByKey } from '../src/store';
 
 describe('store', () => {
   test('generateStore creates expected runtime fields', () => {
@@ -10,14 +10,15 @@ describe('store', () => {
     expect(typeof store.inner).toBe('symbol');
   });
 
-  test('getStoreByKey returns and clears global cache', () => {
+  test('getStoreByKey returns and clears the module-level cache', () => {
     const key = 'unit';
     const value = { x: 1 };
-    window[`${identifier}${key}`] = value;
+    setStoreByKey(key, value);
 
     const picked = getStoreByKey(key);
 
     expect(picked).toBe(value);
-    expect(window[`${identifier}${key}`]).toBeUndefined();
+    // second read should have been cleared by the first getStoreByKey call
+    expect(getStoreByKey(key)).toBeUndefined();
   });
 });

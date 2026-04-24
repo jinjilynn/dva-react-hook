@@ -76,6 +76,9 @@ function Dynamic(props) {
       })
       .catch((err) => {
         console.error(`dynamic resource load failed:${err}`);
+        // Surface the error so the component doesn't stay in a permanent
+        // loading state; consumers can render a fallback when `error` is set.
+        active && setMount({ loaded: false, error: err });
       });
     return () => {
       active = false;

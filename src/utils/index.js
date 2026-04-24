@@ -1,7 +1,7 @@
-import clone from "../clone";
-import { isPlainObject } from "lodash-es";
-import { _split, getPathArray, endurance } from "../reducer";
-import useDispatch from "../useDispatch";
+import clone from '../clone';
+import { isPlainObject } from 'lodash-es';
+import { _split, getPathArray, endurance } from '../reducer';
+import { makeDispatcher } from '../useDispatch';
 
 function isSameType(a, b) {
   return (
@@ -16,7 +16,7 @@ export function get(
     autoCreate: false,
     defaultValue: undefined,
     referenced: false,
-  }
+  },
 ) {
   validateStore(store);
   validateName(name);
@@ -39,7 +39,7 @@ function getClonedState(names, store, options) {
 function createDispatchFn(names, store, clonedState, referenced) {
   return async (value, { cancelUpdate, callbacks } = {}) => {
     const result = await store.dispatch({
-      type: "modify",
+      type: 'modify',
       name: names.join(_split),
       data: value,
       inner: store.inner,
@@ -55,7 +55,7 @@ function createDispatchFn(names, store, clonedState, referenced) {
           name: names.join(_split),
           value: { pre: clonedState, current: value },
         },
-        store
+        store,
       );
     }
     return result;
@@ -66,22 +66,24 @@ export function execBack(modelbacks, callbacks, value, store) {
   validateModelbacks(modelbacks);
 
   const select = (name) => get(name, store);
-  if (typeof callbacks === "string") {
+  if (typeof callbacks === 'string') {
     executeCallback(modelbacks, callbacks, value, select, store);
   } else if (Array.isArray(callbacks)) {
     callbacks.forEach((callbackName) =>
-      executeCallback(modelbacks, callbackName, value, select, store)
+      executeCallback(modelbacks, callbackName, value, select, store),
     );
   }
 }
 
 function executeCallback(modelbacks, callbackName, value, select, store) {
-  if (typeof modelbacks[callbackName] === "function") {
+  if (typeof modelbacks[callbackName] === 'function') {
     modelbacks[callbackName]({
       info: value,
       select,
+      // Use the pure factory rather than the Hook-shaped `useDispatch` so
+      // this callback body never violates Rules of Hooks.
       getDispatch: (action) => {
-        return useDispatch({ ...action, store });
+        return makeDispatcher({ ...action }, store);
       },
     });
   } else {
@@ -91,25 +93,25 @@ function executeCallback(modelbacks, callbackName, value, select, store) {
 
 function validateStore(store) {
   if (!store) {
-    throw new Error("odd!! there is no store in utils, please issue it.");
+    throw new Error('odd!! there is no store in utils, please issue it.');
   }
 }
 
 function validateName(name) {
-  if (typeof name !== "string") {
-    throw new Error("name must be a string");
+  if (typeof name !== 'string') {
+    throw new Error('name must be a string');
   }
 }
 
 function validateModelbacks(modelbacks) {
-  if (Object.prototype.toString.call(modelbacks) !== "[object Object]") {
-    console.error("the callbacks of model must be an Object type");
+  if (Object.prototype.toString.call(modelbacks) !== '[object Object]') {
+    console.error('the callbacks of model must be an Object type');
   }
 }
 
 function getValue(propertyNames, store, options) {
   if (!propertyNames || !propertyNames.length) {
-    throw new Error("Property names array cannot be empty.");
+    throw new Error('Property names array cannot be empty.');
   }
   let autocreated = false;
   const r = propertyNames.reduce((accumulator, propertyName, index) => {
@@ -126,7 +128,7 @@ function getValue(propertyNames, store, options) {
         throw new Error(
           `${propertyName} is not an object, so the property['${
             propertyNames[index + 1]
-          }'] cannot be reached. Please check your code.`
+          }'] cannot be reached. Please check your code.`,
         );
       }
     }

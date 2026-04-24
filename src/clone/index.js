@@ -39,7 +39,9 @@ export default function clone(obj, offline = false) {
       return offline ? null : value;
     }
     if (isDate(value)) {
-      return value.getTime();
+      // Preserve Date type on clone; convert to a timestamp only when
+      // serialising for offline storage.
+      return offline ? value.getTime() : new Date(value.getTime());
     }
     if (isBlob(value)) {
       return value;

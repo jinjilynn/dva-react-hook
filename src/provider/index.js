@@ -2,7 +2,12 @@ import React from 'react';
 import * as localForage from 'localforage';
 import { nanoid } from 'nanoid';
 import { mergeWith } from 'lodash-es';
-import store, { generateStore, getStoreByKey, identifier } from '../store';
+import store, {
+  generateStore,
+  getStoreByKey,
+  setStoreByKey,
+  deleteStoreByKey,
+} from '../store';
 import reducer from '../reducer';
 import initStore from '../utils/redux';
 import { registeModel } from '../dynamic';
@@ -58,11 +63,12 @@ function Provider({
       if (unmounted) {
         return;
       }
-      !isolated && (window[`${identifier}${_key}`] = _store);
+      !isolated && setStoreByKey(_key, _store);
       setCombinedWithStore({ com: _Context.Provider, store: _store });
     };
     const recover = async () => {
       await _init();
+      if (unmounted) return;
       try {
         await _store.offlineInstance.iterate((value, key) => {
           const _v = mergeWith(
@@ -72,6 +78,7 @@ function Provider({
           );
           _store.runtime_state[key] = _v;
         });
+        if (unmounted) return;
         mountStore();
       } catch (err) {
         console.error(`recover from offline database failed:${err}`);
@@ -79,6 +86,7 @@ function Provider({
     };
     const notrecover = async () => {
       await _init();
+      if (unmounted) return;
       mountStore();
     };
     if (offlineConfig.autoRecover === true) {
@@ -92,7 +100,15 @@ function Provider({
       if (storeIndex !== -1) {
         store.splice(storeIndex, 1);
       }
-      !isolated && noCached === true && delete window[`${identifier}${_key}`];
+      !isolated && noCached === true && deleteStoreByKey(_key);
+      // Clear any pending debounce timers/state-diff maps so they don't fire
+      // against an unmounted Provider and hold references after teardown.
+      if (_store.debounceTimers) {
+        _store.debounceTimers.forEach((timer) => clearTimeout(timer));
+        _store.debounceTimers.clear();
+      }
+      _store.previousStateMap && _store.previousStateMap.clear();
+      _store.currentStateMap && _store.currentStateMap.clear();
       setCombinedWithStore({ com: null, store: null });
       _store.offlineInstance.dropInstance();
     };

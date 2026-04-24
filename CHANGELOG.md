@@ -1,8 +1,86 @@
 # Changelog for dva-react-hook
 
+## 2.7.1
+
+- fix: `useAdd` dependency array bug that triggered an infinite dispatch loop
+  when `once` was falsy
+- fix: `useNearestStore` violated the Rules of Hooks by calling `useContext`
+  inside a loop with an early `break`; it now snapshots the provider list
+  with `useRef` and calls `useContext` unconditionally
+- fix: replace `window`-based store cache with a module-level `Map`
+  (`setStoreByKey` / `deleteStoreByKey` / `getStoreByKey`) — SSR safe and no
+  more cross-instance bleed
+- fix: `Provider` recovery path now re-checks the `unmounted` flag after every
+  `await`, avoiding state updates on an unmounted component
+- fix: `Provider` unmount now clears pending `debounceTimers`,
+  `previousStateMap`, and `currentStateMap` so stale timers can't fire
+- fix: `clone` preserves the `Date` type in-memory; timestamps are only used
+  for the offline-serialisation path
+- fix: `Dynamic` now records load errors (`{ loaded: false, error }`) instead
+  of staying in a permanent loading state
+- refactor: extract pure `makeDispatcher(action, store)` from `useDispatch`;
+  `getDispatch` in effects and `executeCallback` in callbacks now call the
+  factory directly and no longer violate the Rules of Hooks
+- docs: rewritten README / DOCUMENTATION, documented `useNearestStore`,
+  `clone`, `get`, `getPathArray`, `checkPrefixRelation`, `Model.callbacks`,
+  `offlineConfig`, and TypeScript usage
+
+## 2.7.0
+
+- improve dispatch ordering, observer subscriptions, and Provider cleanup
+- add `isolated` prop to Provider
+
+## 2.6.x
+
+- fix reducer change-call and change-subscriber ordering
+- fix observe call path
+- refactor `useChange`
+- add `useReference`
+- general performance improvements
+
+## 2.5.x
+
+- export `clone`
+- add `useObserver`
+- expose `offlineInstance` to dispatch effects
+- add previous-state snapshot for `useChange`
+- add `dependencies` param to `useChange`
+- reset field when `defaultValue` type differs from the existing value
+- add `isCopyMeaningless` guard in clone
+- `useModel` memoisation via deep equality
+
+## 2.4.x
+
+- ⚠️ `2.4.0` is deprecated due to an emergency defect — use `2.4.1+`
+- `useNearestStore` introduced
+- reduce waiting time for the "once" update
+- various optimisations
+
+## 2.3.x
+
+- add `getDispatch` for callbacks
+- speed up response action
+- change persistence to async
+- third returned value for `select` / `useModel` (getLatest)
+- add `autoCreate` for `useModel` / `select`
+- update `onChange` callback signature
+- add `useChange`
+
+## 2.2.x
+
+- nested Provider support (you can skip one Provider)
+- add out-of-Provider parameter for `useModel`
+- add `getDispatch` in effect helpers
+- add `customizer` prop for `mergeWith`
+- ensure setState ordering
+- fix re-render when parent state changes but child listener is on a nested key
+- dynamic `useModel`
+- reducer refactor
+
 ## 1.3.3
 
--   add uniqueKey in Provider
+- add uniqueKey in Provider
+
 ## 1.3.2
 
 - add queue caching dispatch when multiple dispatchs are triggered simulaneously
@@ -10,6 +88,7 @@
 ## 1.3.0
 
 - sharing state when call Provider in different palces in different projects
+
 ## 1.2.9
 
 - sharing state when call Provider in different palces in the same project
@@ -28,7 +107,7 @@
 
 ## 1.2.4
 
-- Optimising connect 
+- Optimising connect
 
 ## 1.2.3
 
@@ -40,12 +119,11 @@
 
 ## 1.2.1
 
-- bug  when the entire state is updated, the component that registered the local property of the state  is not updated. 
+- bug when the entire state is updated, the component that registered the local property of the state is not updated.
 
 ## 1.2.0
 
 - add callbacks after set state, and change parameter form of useModel
-
 
 ## 1.1.9
 
@@ -56,8 +134,11 @@
 - add function that updates the model and does not cause an update of the corresponding component
 
 ## 1.1.7
+
 - bug state immutable
+
 ## 1.1.6
+
 ## 1.1.5
 
 Aug 8, 2019
@@ -68,8 +149,7 @@ Aug 8, 2019
 
 Aug 7, 2019
 
-- fix export default is Provider 
-
+- fix export default is Provider
 
 ## 1.1.3
 
@@ -110,4 +190,3 @@ Aug 6, 2019
 ## 1.0.1
 
 ## 1.0.0
-

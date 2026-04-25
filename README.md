@@ -1,6 +1,6 @@
 # dva-react-hook
 
-[![NPM](https://img.shields.io/badge/npm-v2.7.2-blue)](https://www.npmjs.com/package/dva-react-hook)
+[![NPM](https://img.shields.io/badge/npm-v2.7.3-blue)](https://www.npmjs.com/package/dva-react-hook)
 [![size](https://img.shields.io/badge/size-120KB-green)]()
 
 > React Hooks based, concise, lightweight state-management framework with
@@ -48,8 +48,10 @@
       - [More examples](#more-examples-4)
     - [`useNearestStore`](#useneareststore)
       - [Examples](#examples-5)
-    - [Utility exports](#utility-exports)
+    - [`getStoreByUniqueKey`](#getstorebyuniquekey)
       - [Examples](#examples-6)
+    - [Utility exports](#utility-exports)
+      - [Examples](#examples-7)
   - [TypeScript](#typescript)
   - [License](#license)
 
@@ -1110,6 +1112,51 @@ function BridgeToChild({ children }) {
   // children can forward `parentStore` via context / props if they need
   // access to it from inside an isolated sub-Provider.
   return children(parentStore);
+}
+```
+
+### `getStoreByUniqueKey`
+
+```ts
+getStoreByUniqueKey(uniqueKey?: string | number | null): Store | undefined;
+```
+
+Look up a mounted store by the `uniqueKey` you passed to its `<Provider>`.
+Unlike `useNearestStore`, this is a plain function (not a Hook), so it can
+be called from anywhere — service modules, event handlers, sagas, route
+guards, etc. It returns the same `Store` object the Provider exposes via
+context, **without removing it from the internal cache**.
+
+Returns `undefined` when no Provider with that `uniqueKey` has finished
+mounting yet, or when the matching Provider was created with `isolated:
+true` (isolated providers are intentionally not cached).
+
+When `uniqueKey` is omitted/`null`/`undefined`, it falls back to `'default'`
+— matching `<Provider />` without a `uniqueKey` prop.
+
+#### Examples
+
+**1. Dispatch from outside React** (e.g. an HTTP client interceptor):
+
+```javascript
+import { getStoreByUniqueKey } from 'dva-react-hook';
+
+export function onUnauthorized() {
+  const store = getStoreByUniqueKey('app');
+  store?.dispatch({ type: 'change', name: 'auth/token', data: null });
+}
+```
+
+**2. Read latest state in a non-component module**:
+
+```javascript
+import { getStoreByUniqueKey, get } from 'dva-react-hook';
+
+export function getCurrentUserId() {
+  const store = getStoreByUniqueKey('app');
+  if (!store) return null;
+  const [, , getLatest] = get('user/id', store);
+  return getLatest();
 }
 ```
 

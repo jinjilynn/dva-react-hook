@@ -17,6 +17,15 @@ export function deleteStoreByKey(key) {
   storeCache.delete(`${identifier}${key}`);
 }
 
+// Look up a cached store by its `uniqueKey` (the same value passed to
+// <Provider uniqueKey="..." />). Unlike `getStoreByKey`, this does NOT remove
+// the entry from the cache, so it is safe to call from application code that
+// just wants read/dispatch access to an existing store.
+export function getStoreByUniqueKey(uniqueKey) {
+  const _key = (uniqueKey != null && uniqueKey.toString()) || 'default';
+  return storeCache.get(`${identifier}${_key}`);
+}
+
 export function generateStore() {
   const inner = Symbol();
   const MODELS = {};

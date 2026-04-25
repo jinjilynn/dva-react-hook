@@ -1,5 +1,13 @@
 # Changelog for dva-react-hook
 
+## 2.7.3
+
+- feat: export `getStoreByUniqueKey(uniqueKey)` — a non-Hook lookup that
+  returns the cached store for a given `<Provider uniqueKey>`, so app code
+  outside the React tree (HTTP interceptors, services, etc.) can dispatch /
+  read state without a Hook. Unlike the internal `getStoreByKey`, this does
+  **not** evict the entry from the cache.
+
 ## 2.7.2
 
 - refactor: migrate `useModel` and `useReference` subscriptions to

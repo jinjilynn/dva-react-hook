@@ -1,8 +1,13 @@
 import React from 'react';
+import { useSyncExternalStore as mockedUseSyncExternalStore } from 'use-sync-external-store/shim';
 import useModel from '../src/useModel';
 import useReference from '../src/useReference';
 import StoreContext, { useNearestStore } from '../src/store';
 import { get } from '../src/utils';
+
+jest.mock('use-sync-external-store/shim', () => ({
+  useSyncExternalStore: jest.fn(),
+}));
 
 jest.mock('../src/utils', () => ({
   get: jest.fn(),
@@ -17,27 +22,27 @@ jest.mock('../src/store', () => {
 });
 
 describe('useModel / useReference / useNearestStore', () => {
-  let cleanup;
-  let forceUpdate;
+  let cleanupFn;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    cleanup = undefined;
-    forceUpdate = jest.fn();
-    jest.spyOn(React, 'useRef').mockReturnValue({ current: undefined });
-    jest.spyOn(React, 'useState').mockReturnValue(['seed', forceUpdate]);
-    jest.spyOn(React, 'useEffect').mockImplementation((effect) => {
-      cleanup = effect();
+    cleanupFn = undefined;
+    mockedUseSyncExternalStore.mockImplementation((subscribe, getSnapshot) => {
+      cleanupFn = subscribe(() => {});
+      return getSnapshot();
     });
+    jest
+      .spyOn(React, 'useRef')
+      .mockImplementation((initial) => ({ current: initial }));
+    jest.spyOn(React, 'useCallback').mockImplementation((fn) => fn);
   });
 
   afterEach(() => {
     React.useRef.mockRestore();
-    React.useState.mockRestore();
-    React.useEffect.mockRestore();
+    React.useCallback.mockRestore();
   });
 
-  test('useModel reads from nearest store and manages refresh cache', () => {
+  test('useModel reads from nearest store and registers a REFRESH_CACHE listener', () => {
     const store = { REFRESH_CACHE: {} };
     const setter = jest.fn();
     const latest = jest.fn();
@@ -51,13 +56,19 @@ describe('useModel / useReference / useNearestStore', () => {
     expect(result).toEqual([value, setter, latest]);
     expect(get).toHaveBeenCalledWith('user', store, undefined);
     const key = Object.keys(store.REFRESH_CACHE)[0];
-    expect(store.REFRESH_CACHE[key]).toEqual({ _s: 'user', set: forceUpdate });
+    expect(store.REFRESH_CACHE[key]).toEqual(
+      expect.objectContaining({
+        _s: 'user',
+        version: 0,
+        listener: expect.any(Function),
+      }),
+    );
 
-    cleanup();
+    cleanupFn();
     expect(Object.keys(store.REFRESH_CACHE)).toHaveLength(0);
   });
 
-  test('useModel skips refresh cache when cancelupdate=true', () => {
+  test('useModel skips REFRESH_CACHE when cancelupdate=true', () => {
     const store = { REFRESH_CACHE: {} };
     const setter = jest.fn();
     const latest = jest.fn();
@@ -86,9 +97,15 @@ describe('useModel / useReference / useNearestStore', () => {
       expect.objectContaining({ store, referenced: true }),
     );
     const key = Object.keys(store.REFRESH_CACHE)[0];
-    expect(store.REFRESH_CACHE[key]).toEqual({ _s: 'user', set: forceUpdate });
+    expect(store.REFRESH_CACHE[key]).toEqual(
+      expect.objectContaining({
+        _s: 'user',
+        version: 0,
+        listener: expect.any(Function),
+      }),
+    );
 
-    cleanup();
+    cleanupFn();
     expect(Object.keys(store.REFRESH_CACHE)).toHaveLength(0);
   });
 

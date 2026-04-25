@@ -1,4 +1,3 @@
-import { nanoid } from 'nanoid';
 import clone from '../clone';
 import { isPlainObject, get, isEqual, set as _set } from 'lodash-es';
 
@@ -176,15 +175,24 @@ export default async function reducer(action) {
         if (!action.cancelUpdate) {
           const track = Object.values(store.REFRESH_CACHE);
           const parentTrack = `${names.join(_split)}${_split}`;
+          // Each entry is a per-hook record: { _s, version, listener }. We bump
+          // `version` so that useSyncExternalStore's getSnapshot returns a new
+          // value, then invoke the listener to schedule the React update. We
+          // keep a flag to avoid double-notifying entries matched by both the
+          // descendant prefix check and the ancestor walk-up below.
           track.forEach((it) => {
-            if (it && it._s.startsWith(parentTrack)) {
-              it.set(nanoid());
-            }
+            if (!it) return;
+            let notified = false;
+            const notify = () => {
+              if (notified) return;
+              notified = true;
+              it.version = (it.version || 0) + 1;
+              if (typeof it.listener === 'function') it.listener();
+            };
+            if (it._s.startsWith(parentTrack)) notify();
             const _names = [...names];
             while (_names.length > 0) {
-              if (it && _names.join(_split) === it._s) {
-                it.set(nanoid());
-              }
+              if (_names.join(_split) === it._s) notify();
               _names.pop();
             }
           });

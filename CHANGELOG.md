@@ -1,5 +1,15 @@
 # Changelog for dva-react-hook
 
+## Unreleased
+
+- refactor: migrate `useModel` and `useReference` subscriptions to
+  `useSyncExternalStore` (via `use-sync-external-store/shim` for React 16.8+
+  compatibility), making re-renders tear-free and fully concurrent-mode safe.
+  `REFRESH_CACHE` entries are now `{ _s, version, listener }` and the reducer
+  bumps `version` + invokes `listener()` on matching path changes; the legacy
+  `set(nanoid())` call is preserved for backwards compatibility with any
+  external consumers of the cache shape.
+
 ## 2.7.1
 
 - fix: `useAdd` dependency array bug that triggered an infinite dispatch loop

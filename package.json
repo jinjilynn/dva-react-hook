@@ -43,9 +43,8 @@
     "localforage": "^1.10.0",
     "lodash-es": "^4.17.21",
     "nanoid": "^4.0.0",
-    "react": "^16.8.6"
-  },
-  "dependencies": {
+    "react": "^16.8.6",
     "use-sync-external-store": "^1.6.0"
-  }
+  },
+  "dependencies": {}
 }

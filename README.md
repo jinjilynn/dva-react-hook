@@ -1,11 +1,16 @@
 # dva-react-hook
 
-[![NPM](https://img.shields.io/badge/npm-v2.7.1-blue)](https://www.npmjs.com/package/dva-react-hook)
+[![NPM](https://img.shields.io/badge/npm-v2.7.2-blue)](https://www.npmjs.com/package/dva-react-hook)
 [![size](https://img.shields.io/badge/size-120KB-green)]()
 
 > React Hooks based, concise, lightweight state-management framework with
 > first-class support for offline persistence (including `Blob`,
 > `ArrayBuffer`, typed arrays and all primitive types).
+>
+> Subscriptions in `useModel` / `useReference` are powered by
+> [`useSyncExternalStore`](https://react.dev/reference/react/useSyncExternalStore)
+> (via `use-sync-external-store/shim`), so re-renders are **tear-free under
+> React 18 concurrent rendering** while remaining compatible with React 16.8+.
 
 > ⚠️ Version `2.4.0` is deprecated (emergency bug). Use `2.4.1+`.
 

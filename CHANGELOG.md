@@ -1,6 +1,6 @@
 # Changelog for dva-react-hook
 
-## Unreleased
+## 2.7.2
 
 - refactor: migrate `useModel` and `useReference` subscriptions to
   `useSyncExternalStore` (via `use-sync-external-store/shim` for React 16.8+

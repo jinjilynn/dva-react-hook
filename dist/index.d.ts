@@ -274,6 +274,10 @@ export function useReference<T = any>(
 
 export function useNearestStore(): Store | undefined;
 
+export function getStoreByUniqueKey(
+  uniqueKey?: string | number | null,
+): Store | undefined;
+
 export function checkPrefixRelation(
   prearray: string[],
   currentarray: string[],
